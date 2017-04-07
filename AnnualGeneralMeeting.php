@@ -1,14 +1,34 @@
 <?php
 class AnnualGeneralMeeting extends PluginBase {
   protected $storage            = 'DbStorage';
-  static protected $name        = 'Annual General Meeting';
-  static protected $description = "Voting at Annual Assembly Meetings made easy";
+  static protected $name        = '';
+  static protected $description = '';
   
 
   public function __construct(PluginManager $manager, $id) {
-      parent::__construct($manager, $id);
-      $this->subscribe('beforeSurveySettings');
-      $this->subscribe('newSurveySettings');
+    parent::__construct($manager, $id);
+
+    self::$name         = $this->getProperty('name');
+    self::$description  = $this->getProperty('description');
+
+    $this->subscribe('beforeSurveySettings');
+    $this->subscribe('newSurveySettings');
+  }
+
+
+  public function getProperty($key) {
+    switch($key) {
+      case 'name':
+        return gT("Annual General Meeting");
+        break;
+
+      case 'description':
+        return gT("Voting at Annual Assembly Meetings made easy");
+        break;
+
+      default:
+        return $key . ' is not a valid key';
+    }
   }
 
 
@@ -29,7 +49,7 @@ class AnnualGeneralMeeting extends PluginBase {
                   'label'=>'A json setting',
                   'editorOptions'=>array('mode'=>'tree'),
                   'help'=>'For json settings, here with \'editorOptions\'=>array(\'mode\'=>\'tree\'), . See jsoneditoronline.org',
-                  'current' => $this->get('weights', 'Survey', $event->get('survey'), '{"Collège Consommateur": 1, "Collège Salariés": 2, "Collège Producteurs": 3, "Collège Porteurs": 2}'),
+                  'current' => $this->get('weights', 'Survey', $event->get('survey'), '{"Consommateurs": 1, "Salariés": 2, "Producteurs": 3, "Porteurs": 4}'),
               ),
           )
        ));

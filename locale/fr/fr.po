@@ -1,0 +1,25 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: LimeSurvey - Annual General Assembly\n"
+"POT-Creation-Date: 2017-04-07 18:18+0200\n"
+"PO-Revision-Date: 2017-04-07 18:24+0200\n"
+"Last-Translator: \n"
+"Language-Team: Happy Dev <alexandre@happy-dev.fr>\n"
+"Language: php\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.11\n"
+"X-Poedit-Basepath: ../../../var/www/html/limesurvey.dev/plugins/"
+"AnnualGeneralMeeting\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: gT\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: AnnualGeneralMeeting.php:22
+msgid "Annual General Meeting"
+msgstr "Assemblée générale"
+
+#: AnnualGeneralMeeting.php:26
+msgid "Voting at Annual Assembly Meetings made easy"
+msgstr "Voter en Assemblée Générale n'a jamais été aussi simple\t"
