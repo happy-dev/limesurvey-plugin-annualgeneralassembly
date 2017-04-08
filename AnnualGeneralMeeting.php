@@ -1,8 +1,11 @@
 <?php
+use \ls\menu\MenuItem;
+
 class AnnualGeneralMeeting extends PluginBase {
-  protected $storage            = 'DbStorage';
   static protected $name        = '';
   static protected $description = '';
+  protected $storage            = 'DbStorage';
+  protected $defaultSettings    = '{"Consommateurs": 1, "Salariés": 2, "Producteurs": 3}';
   
 
   public function __construct(PluginManager $manager, $id) {
@@ -13,6 +16,8 @@ class AnnualGeneralMeeting extends PluginBase {
 
     $this->subscribe('beforeSurveySettings');
     $this->subscribe('newSurveySettings');
+    $this->subscribe('beforeControllerAction');
+    $this->subscribe('beforeToolsMenuRender');
   }
 
 
@@ -49,7 +54,7 @@ class AnnualGeneralMeeting extends PluginBase {
                   'label'=>'A json setting',
                   'editorOptions'=>array('mode'=>'tree'),
                   'help'=>'For json settings, here with \'editorOptions\'=>array(\'mode\'=>\'tree\'), . See jsoneditoronline.org',
-                  'current' => $this->get('weights', 'Survey', $event->get('survey'), '{"Consommateurs": 1, "Salariés": 2, "Producteurs": 3, "Porteurs": 4}'),
+                  'current' => $this->get('weights', 'Survey', $event->get('survey'), $this->defaultSettings),
               ),
           )
        ));
@@ -65,5 +70,46 @@ class AnnualGeneralMeeting extends PluginBase {
           $default=$event->get($name,null,null,isset($this->settings[$name]['default'])?$this->settings[$name]['default']:NULL);
           $this->set($name, $value, 'Survey', $event->get('survey'),$default);
       }
+  }
+
+
+  public function beforeControllerAction() {
+    if ($this->event->get('controller') == 'admin' && $this->event->get('action') == 'statistics') {
+    }
+  }
+
+
+  // Adds a menu within the Tools menu if the weightings were set for the survey
+  public function beforeToolsMenuRender() {
+    $event    = $this->getEvent();
+    $weights  = $this->get('weights', 'Survey', $event->get('surveyId'));
+
+    if (isset($weights) && $weights !== $this->defaultSettings) {
+
+      $surveyId = $event->get('surveyId');
+
+      $href = Yii::app()->createUrl(
+        'admin/pluginhelper',
+        array(
+          'sa' => 'sidebody',// sidebody || fullpagewrapper
+          'plugin' => 'AnnualGeneralMeeting',
+          'method' => 'actionIndex',
+          'surveyId' => $surveyId
+        )
+      );
+
+      $menuItem = new MenuItem(array(
+        'label' => gT('AG'),
+        'iconClass' => 'fa fa-magic',
+        'href' => $href
+      ));
+
+      $event->append('menuItems', array($menuItem));
+
+    }
+  }
+
+
+  public function actionIndex() {
   }
 }
