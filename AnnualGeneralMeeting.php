@@ -1,6 +1,10 @@
 <?php
 use \ls\menu\MenuItem;
 
+/**
+ * Entry point of the plugin
+ * Interface with LimeSurvey's API
+ */
 class AnnualGeneralMeeting extends PluginBase {
   static protected $name        = '';
   static protected $description = '';
@@ -43,38 +47,30 @@ class AnnualGeneralMeeting extends PluginBase {
    * The plugin should return setting meta data.
    * @param PluginEvent $event
    */
-  public function beforeSurveySettings()
-  {
-      $event = $this->event;
-      $event->set("surveysettings.{$this->id}", array(
-          'name' => get_class($this),
-          'settings' => array(
-              'weights'=>array(
-                  'type'=>'json',
-                  'label'=>'A json setting',
-                  'editorOptions'=>array('mode'=>'tree'),
-                  'help'=>'For json settings, here with \'editorOptions\'=>array(\'mode\'=>\'tree\'), . See jsoneditoronline.org',
-                  'current' => $this->get('weights', 'Survey', $event->get('survey'), $this->defaultSettings),
-              ),
-          )
-       ));
+  public function beforeSurveySettings() {
+    $event = $this->event;
+    $event->set("surveysettings.{$this->id}", array(
+      'name' => get_class($this),
+      'settings' => array(
+        'weights'=>array(
+          'type'=>'json',
+          'label'=> gT('Pondérations par collège'),
+          'editorOptions'=>array('mode'=>'tree'),
+          'help'=> gT("Renseignez les pondérations des différents collèges pour le calcul des votes en AG"),
+          'current' => $this->get('weights', 'Survey', $event->get('survey'), $this->defaultSettings),
+        ),
+      )
+     ));
   }
 
 
-  public function newSurveySettings()
-  {
-      $event = $this->event;
-      foreach ($event->get('settings') as $name => $value)
-      {
-          /* In order use survey setting, if not set, use global, if not set use default */
-          $default=$event->get($name,null,null,isset($this->settings[$name]['default'])?$this->settings[$name]['default']:NULL);
-          $this->set($name, $value, 'Survey', $event->get('survey'),$default);
-      }
-  }
-
-
-  public function beforeControllerAction() {
-    if ($this->event->get('controller') == 'admin' && $this->event->get('action') == 'statistics') {
+  public function newSurveySettings() {
+    $event = $this->event;
+    foreach ($event->get('settings') as $name => $value)
+    {
+      /* In order use survey setting, if not set, use global, if not set use default */
+      $default = $event->get($name, null, null, isset($this->settings[$name]['default']) ? $this->settings[$name]['default'] : null);
+      $this->set($name, $value, 'Survey', $event->get('survey'),$default);
     }
   }
 
@@ -93,7 +89,7 @@ class AnnualGeneralMeeting extends PluginBase {
         array(
           'sa' => 'sidebody',// sidebody || fullpagewrapper
           'plugin' => 'AnnualGeneralMeeting',
-          'method' => 'actionIndex',
+          'method' => 'outputResults',
           'surveyId' => $surveyId
         )
       );
@@ -110,6 +106,13 @@ class AnnualGeneralMeeting extends PluginBase {
   }
 
 
-  public function actionIndex() {
+  // Outputs the HTML of the results page
+  public function outputResults($surveyId) {
+    Yii::setPathOfAlias('AnnualGeneralMeeting', dirname(__FILE__));
+    Yii::import('AnnualGeneralMeeting.helpers.Results');
+
+    $Results = new Results($surveyId);
+
+    return $this->renderPartial('results', $Results->getResultsData(), true);
   }
 }
