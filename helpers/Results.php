@@ -19,46 +19,62 @@ class Results {
     //$survey->metaData->columns;// Columns
     //$survey->search();// Data provider to Reponses grid widget
 
-    $survey     = SurveyDynamic::model($this->surveyId);
-    $questions  = $this->getQuestions(); 
+    $survey           = SurveyDynamic::model($this->surveyId);
+    $questions        = $this->getQuestions(); 
+    $choices          = $this->getChoices($question['qid']);
+    $answers          = $this->getAnswers();
+    $people           = $this->getPeople($answers);
+    $answers          = $this->getAnswers();// Required, as rewinding is not an option
+    $tokensToColleges = $this->getTokensToColleges($people);
+    $resultsByCollege = [];
+    $startIndex       = 0;
+    $yet              = false;
 
-    foreach ($questions->readAll() as $question) {
-      $choices          = $this->getChoices($question->qid);
-      $answers          = $this->getAnswers();
-      $people           = $this->getPeople($answers);
-      $answers          = $this->getAnswers();// Required, as rewinding is not an option
-      $tokensToColleges = $this->getTokensToColleges($people);
-      $resultsByCollege = [];
+    Yii::import('AnnualGeneralMeeting.helpers.Utils');
 
-      foreach($answers as $answer) {
-        if (!isset($resultsByCollege[ $question->qid ])) {
-          $resultsByCollege[ $question->qid ] = [];
+    foreach($answers as $answer) {
+      foreach($answer as $k => $v) {
+
+        if (Utils::startsWith($this->surveyId, $k)) {
+          $yet = true;
+
+          if (!isset($resultsByCollege[$k])) {
+            $resultsByCollege[$k] = [];
+          }
+          if (!isset($resultsByCollege[$k][$tokensToColleges[$answer['token']]])) {
+            $resultsByCollege[$k][ $tokensToColleges[ $answer['token'] ] ] = [];
+          }
+          if (!isset($resultsByCollege[$k][$tokensToColleges[$answer['token']]][$v])) {
+            $resultsByCollege[$k][ $tokensToColleges[ $answer['token'] ] ][$v] = 0;
+          }
+          $resultsByCollege[$k][ $tokensToColleges[ $answer['token'] ] ][$v]++;
         }
-        if (!isset($resultsByCollege[ $question->qid ][ $tokensToColleges[ $answer->token ] ])) {
-          $resultsByCollege[ $question->qid ][ $tokensToColleges[ $answer->token ] ] = 0;
+        else if (!$yet) {
+          $startIndex++;
         }
-        $resultsByCollege[ $question->qid ][ $tokensToColleges[ $answer->token ] ]++;
       }
     }
 
     $totalAnswers           = $survey->count();
     $totalCompletedAnswers  = $survey->count('submitdate IS NOT NULL');
 
-    print_r($resultsByCollege);
-
     return array(
       'totalAnswers'              => $totalAnswers,
       'totalCompletedAnswers'     => $totalCompletedAnswers,
+      'questions'                 => $questions,
+      'choices'                   => $choices,
       'resultsByCollege'          => $resultsByCollege,
+      'startIndex'                => $startIndex,
     );
   }
 
 
   // Returns resolutions only of the given survey
   public function getQuestions() {
-    $query      = "SELECT qid, title, question FROM {{questions}} WHERE parent_qid=0 AND sid='{$this->surveyId}' AND title LIKE 'R%' ORDER BY gid, question_order ASC";
+    $query      = "SELECT qid, title, question FROM {{questions}} WHERE parent_qid=0 AND sid='{$this->surveyId}' ORDER BY gid, question_order ASC";
+    // AND title LIKE 'R%' 
 
-    return  Yii::app()->db->createCommand($query)->query();
+    return Yii::app()->db->createCommand($query)->query();
   }
 
 
@@ -84,7 +100,7 @@ class Results {
     $tokensStr  = '';
 
     foreach($answers as $answer) {
-      $tokens[] = $answer->token;
+      $tokens[] = $answer['token'];
     }
 
     $tokensStr  = "'". implode("','", $tokens) ."'"; 
@@ -98,7 +114,7 @@ class Results {
     $tokensToColleges = [];
 
     foreach($people as $p) {
-      $tokensToColleges[$p->token] = $p->{$this->collegeField};
+      $tokensToColleges[$p['token']] = $p[$this->collegeField];
     }
 
     return $tokensToColleges;

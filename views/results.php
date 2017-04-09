@@ -3,15 +3,39 @@
   <div class='row'>
     <div class='col-sm-6'>
       <p>Left column</p>
-      <table>
-        <tr>
-          <td>Total answers : </td>
-          <td><?php echo $totalAnswers ?></td>
-        </tr>
-        <tr>
-          <td>Total completed answers : </td>
-          <td><?php echo $totalCompletedAnswers ?></td>
-        </tr>
+<?php
+      $html = '';
+      $idx  = 0;
+
+      foreach($questions as $question) {
+        if ($idx >= $startIndex) {
+          $html .=  "<table>";
+          $html .=    "<tr>";
+          $html .=      "<td>{$question['title']}. {$question['question']}</td>";
+          $html .=    "</tr>";
+
+          $html .=    "<tr>";
+          //foreach($questions as $choices) {
+            //foreach($choices as $choice => $result) {
+              //$html .=    "<td>{$choice}</td>";
+            //}
+          //}
+          $html .=    "</tr>";
+
+          $html .=    "<tr>";
+          //foreach($questions as $choices) {
+            //foreach($choices as $choice => $result) {
+              //$html .=    "<td>{$result}</td>";
+            //}
+          //}
+          $html .=    "</tr>";
+          $html .=  "</table>";
+        }
+
+        $idx++;
+      }
+      echo $html;
+?>
       </table>
     </div>
     <div class='col-sm-6'>
