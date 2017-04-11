@@ -21,23 +21,22 @@ class Results {
 
     $survey           = SurveyDynamic::model($this->surveyId);
     $questions        = $this->getQuestions(); 
-    $choices          = $this->getChoices($question['qid']);
+    $questionsIds     = array_keys($questions);
+    $choices          = $this->getChoices(implode(',', $questionsIds));
     $answers          = $this->getAnswers();
     $people           = $this->getPeople($answers);
     $answers          = $this->getAnswers();// Required, as rewinding is not an option
     $tokensToColleges = $this->getTokensToColleges($people);
+    $sgqaStart        = $this->getSGQAStart();
     $resultsByCollege = [];
     $startIndex       = 0;
-    $yet              = false;
 
     Yii::import('AnnualGeneralMeeting.helpers.Utils');
 
     foreach($answers as $answer) {
       foreach($answer as $k => $v) {
 
-        if (Utils::startsWith($this->surveyId, $k)) {
-          $yet = true;
-
+        if (Utils::startsByOneOfThese($k, $sgqaStart)) {
           if (!isset($resultsByCollege[$k])) {
             $resultsByCollege[$k] = [];
           }
@@ -48,9 +47,6 @@ class Results {
             $resultsByCollege[$k][ $tokensToColleges[ $answer['token'] ] ][$v] = 0;
           }
           $resultsByCollege[$k][ $tokensToColleges[ $answer['token'] ] ][$v]++;
-        }
-        else if (!$yet) {
-          $startIndex++;
         }
       }
     }
@@ -63,26 +59,41 @@ class Results {
       'totalCompletedAnswers'     => $totalCompletedAnswers,
       'questions'                 => $questions,
       'choices'                   => $choices,
+      'sgqaStart'                 => $sgqaStart,
       'resultsByCollege'          => $resultsByCollege,
-      'startIndex'                => $startIndex,
     );
   }
 
 
   // Returns resolutions only of the given survey
   public function getQuestions() {
-    $query      = "SELECT qid, title, question FROM {{questions}} WHERE parent_qid=0 AND sid='{$this->surveyId}' ORDER BY gid, question_order ASC";
-    // AND title LIKE 'R%' 
+    $query      = "SELECT qid, title, question FROM {{questions}} WHERE parent_qid=0 AND sid='{$this->surveyId}' AND title LIKE 'R%' ORDER BY gid, question_order ASC";
+    $results    =  Yii::app()->db->createCommand($query)->query();
+    $questions  = [];
 
-    return Yii::app()->db->createCommand($query)->query();
+    foreach($results as $r) {
+      $questions[$r['qid']] = [
+        'qid'       => $r['qid'],
+        'title'     => $r['title'],
+        'question'  => $r['question'],
+      ];
+    }
+
+    return $questions;
   }
 
 
   // Returns possible choices for a given question (multiple choice question) 
-  public function getChoices($qid) {// Question Id
-    $query      = "SELECT code, answer FROM {{answers}} WHERE qid='{$qid}' ORDER BY sortorder ASC";
+  public function getChoices($questionsIds) {// Questions Ids
+    $query      = "SELECT code, answer FROM {{answers}} WHERE qid IN ({$questionsIds}) ORDER BY code ASC";
+    $answers    =  Yii::app()->db->createCommand($query)->query();
+    $choices    = [];
 
-    return  Yii::app()->db->createCommand($query)->query();
+    foreach($answers as $answer) {
+      $choices[$answer['code']] = $answer['answer'];
+    }
+
+    return $choices;
   }
 
 
@@ -118,5 +129,18 @@ class Results {
     }
 
     return $tokensToColleges;
+  }
+
+
+  public function getSGQAStart() {
+    $SGQAs      = [];
+    $query      = "SELECT gid FROM {{groups}} WHERE sid='{$this->surveyId}' AND group_name LIKE 'Résolutions%'";
+    $groups     = Yii::app()->db->createCommand($query)->query();
+
+    foreach($groups as $group) {
+      $SGQAs[] = $this->surveyId .'X'. $group['gid'];
+    }
+
+    return $SGQAs;
   }
 }

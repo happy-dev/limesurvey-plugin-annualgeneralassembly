@@ -1,46 +1,56 @@
 <div class='container-fluid'>
-  <h3 class='pagetitle'>A page</h3>
+<h3 class='pagetitle'><?php echo gT("Résultats") ?></h3>
   <div class='row'>
-    <div class='col-sm-6'>
-      <p>Left column</p>
 <?php
+      Yii::import('AnnualGeneralMeeting.helpers.Utils');
+
       $html = '';
-      $idx  = 0;
 
       foreach($questions as $question) {
-        if ($idx >= $startIndex) {
-          $html .=  "<table>";
-          $html .=    "<tr>";
-          $html .=      "<td>{$question['title']}. {$question['question']}</td>";
-          $html .=    "</tr>";
+        $html .=  "<table>";
+        $html .=    "<tr>";
+        $html .=      "<td colspan=\"3\">{$question['title']}. {$question['question']}</td>";
+        $html .=    "</tr>";
 
-          $html .=    "<tr>";
-          //foreach($questions as $choices) {
-            //foreach($choices as $choice => $result) {
-              //$html .=    "<td>{$choice}</td>";
-            //}
-          //}
-          $html .=    "</tr>";
+        $colleges = current($resultsByCollege);
 
-          $html .=    "<tr>";
-          //foreach($questions as $choices) {
-            //foreach($choices as $choice => $result) {
-              //$html .=    "<td>{$result}</td>";
-            //}
-          //}
-          $html .=    "</tr>";
-          $html .=  "</table>";
+        foreach($colleges as $college => $answers) {
+          if (!Utils::nullOrEmpty($college)) {
+            $html .=    "<tr>";
+            $html .=      "<td colspan=\"3\"><strong>{$college}</strong></td>";
+            $html .=    "</tr>";
+
+            $html .=    "<tr>";
+            $results = "";
+            foreach($answers as $code => $result) {
+              if (!Utils::nullOrEmpty($choices[$code])) {
+                $html    .=   "<td>{$choices[$code]}</td>";
+              }
+              else {
+                $html    .=   "<td>N'a pas voté</td>";
+              }
+              $results .=   "<td>{$result}</td>";
+            }
+            $html .=    "</tr>";
+
+            $html .=    "<tr>";
+            $html .=      $results;
+            $html .=    "</tr>";
+
+            $html .=    "<tr>";
+            $html .=    "<td>&nbsp;</td>";
+            $html .=    "</tr>";
+          }
         }
 
-        $idx++;
+        $html .=  "</table>";
+        $html .=  "<br/><br/><br/><br/>";
+
+        next($resultsByCollege);
       }
+
       echo $html;
 ?>
-      </table>
-    </div>
-    <div class='col-sm-6'>
-      <p>Right column</p>
-    </div>
   </div>
 </div>
 
