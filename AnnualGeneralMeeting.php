@@ -78,30 +78,32 @@ class AnnualGeneralMeeting extends PluginBase {
   // Adds a menu within the Tools menu if the weightings were set for the survey
   public function beforeToolsMenuRender() {
     $event    = $this->getEvent();
-    $weights  = $this->get('weights', 'Survey', $event->get('surveyId'));
+    $menuItem = $event->get('menuItems')[0];
 
-    if (isset($weights) && $weights !== $this->defaultSettings) {
+    if (get_class($menuItem) == get_class($this)) {// Preventing double menu on the page
+      $weights  = $this->get('weights', 'Survey', $event->get('surveyId'));
 
-      $surveyId = $event->get('surveyId');
+      if (isset($weights) && $weights !== $this->defaultSettings) {
+        $surveyId = $event->get('surveyId');
 
-      $href = Yii::app()->createUrl(
-        'admin/pluginhelper',
-        array(
-          'sa' => 'sidebody',// sidebody || fullpagewrapper
-          'plugin' => 'AnnualGeneralMeeting',
-          'method' => 'outputResults',
-          'surveyId' => $surveyId
-        )
-      );
+        $href = Yii::app()->createUrl(
+          'admin/pluginhelper',
+          array(
+            'sa' => 'sidebody',// sidebody || fullpagewrapper
+            'plugin' => 'AnnualGeneralMeeting',
+            'method' => 'outputResults',
+            'surveyId' => $surveyId
+          )
+        );
 
-      $menuItem = new MenuItem(array(
-        'label' => gT('AG'),
-        'iconClass' => 'fa fa-magic',
-        'href' => $href
-      ));
+        $menuItem = new MenuItem(array(
+          'label' => gT('AG'),
+          'iconClass' => 'fa fa-magic',
+          'href' => $href
+        ));
 
-      $event->append('menuItems', array($menuItem));
-
+        $event->append('menuItems', array($menuItem));
+      }
     }
   }
 

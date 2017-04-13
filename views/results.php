@@ -12,35 +12,36 @@
         $html .=      "<td colspan=\"3\">{$question['title']}. {$question['question']}</td>";
         $html .=    "</tr>";
 
-        $colleges = current($resultsByCollege);
+        $colleges   = current($resultsByCollege);
 
-        foreach($colleges as $college => $answers) {
+        foreach($colleges as $college => $codesToResults) {
           if (!Utils::nullOrEmpty($college)) {
             $html .=    "<tr>";
             $html .=      "<td colspan=\"3\"><strong>{$college}</strong></td>";
             $html .=    "</tr>";
 
             $html .=    "<tr>";
-            $results = "";
-            foreach($answers as $code => $result) {
-              if (!Utils::nullOrEmpty($choices[$code])) {
-                $html    .=   "<td>{$choices[$code]}</td>";
-              }
-              else {
-                $html    .=   "<td>N'a pas voté</td>";
-              }
-              $results .=   "<td>{$result}</td>";
+            $resultsStr = "";
+            foreach($choices as $code => $answer) {
+              $results = current($codesToResults);
+
+              $html    .=   "<td>{$answer}</td>";
+              $resultsStr .=   "<td>{$codesToResults[$code]}</td>";
+
+              next($codesToResults);
             }
             $html .=    "</tr>";
 
             $html .=    "<tr>";
-            $html .=      $results;
+            $html .=      $resultsStr;
             $html .=    "</tr>";
 
             $html .=    "<tr>";
             $html .=    "<td>&nbsp;</td>";
             $html .=    "</tr>";
           }
+
+          next($colleges);
         }
 
         $html .=  "</table>";

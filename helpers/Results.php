@@ -33,20 +33,21 @@ class Results {
 
     Yii::import('AnnualGeneralMeeting.helpers.Utils');
 
+    // Computing results
     foreach($answers as $answer) {
-      foreach($answer as $k => $v) {
+      foreach($answer as $sgqa => $code) {
 
-        if (Utils::startsByOneOfThese($k, $sgqaStart)) {
-          if (!isset($resultsByCollege[$k])) {
-            $resultsByCollege[$k] = [];
+        if (Utils::startsByOneOfThese($sgqa, $sgqaStart)) {
+          if (!isset($resultsByCollege[$sgqa])) {
+            $resultsByCollege[$sgqa] = [];
           }
-          if (!isset($resultsByCollege[$k][$tokensToColleges[$answer['token']]])) {
-            $resultsByCollege[$k][ $tokensToColleges[ $answer['token'] ] ] = [];
+          if (!isset($resultsByCollege[$sgqa][$tokensToColleges[$answer['token']]])) {
+            $resultsByCollege[$sgqa][ $tokensToColleges[ $answer['token'] ] ] = [];
           }
-          if (!isset($resultsByCollege[$k][$tokensToColleges[$answer['token']]][$v])) {
-            $resultsByCollege[$k][ $tokensToColleges[ $answer['token'] ] ][$v] = 0;
+          if (!isset($resultsByCollege[$sgqa][$tokensToColleges[$answer['token']]][$code])) {
+            $resultsByCollege[$sgqa][ $tokensToColleges[ $answer['token'] ] ][$code] = 0;
           }
-          $resultsByCollege[$k][ $tokensToColleges[ $answer['token'] ] ][$v]++;
+          $resultsByCollege[$sgqa][ $tokensToColleges[ $answer['token'] ] ][$code]++;
         }
       }
     }
@@ -87,7 +88,7 @@ class Results {
   public function getChoices($questionsIds) {// Questions Ids
     $query      = "SELECT code, answer FROM {{answers}} WHERE qid IN ({$questionsIds}) ORDER BY code ASC";
     $answers    =  Yii::app()->db->createCommand($query)->query();
-    $choices    = [];
+    $choices    = [ null => "N'a pas voté"];
 
     foreach($answers as $answer) {
       $choices[$answer['code']] = $answer['answer'];
