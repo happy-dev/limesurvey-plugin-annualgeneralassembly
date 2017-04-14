@@ -26,6 +26,7 @@ class Results {
 
     $survey           = SurveyDynamic::model($this->surveyId);
     $questions        = $this->getQuestions(); 
+    $subQuestions     = $this->getQuestions(true); 
     $questionsIds     = array_keys($questions);
     $choices          = $this->getMultipleChoices(implode(',', $questionsIds));
     $answers          = $this->getAnswers();
@@ -58,6 +59,7 @@ class Results {
 
     return array(
       'questions'                 => $questions,
+      'subQuestions'              => $subQuestions,
       'choices'                   => $choices,
       'sgqaStart'                 => $sgqaStart,
       'resultsByCollege'          => $resultsByCollege,
@@ -65,15 +67,17 @@ class Results {
   }
 
 
-  // Returns resolutions only of the given survey
-  public function getQuestions() {
-    $query      = "SELECT qid, type, title, question FROM {{questions}} WHERE parent_qid=0 AND sid='{$this->surveyId}' AND title LIKE 'R%' ORDER BY gid, question_order ASC";
+  // Returns resolutions or subquestions of the given survey
+  public function getQuestions($subquestions = false) {
+    $s          = $sub ? '!' : '';
+    $query      = "SELECT qid, qid, type, title, question FROM {{questions}} WHERE parent_qid{$s}=0 AND sid='{$this->surveyId}' ORDER BY gid, question_order ASC";
     $results    =  Yii::app()->db->createCommand($query)->query();
     $questions  = [];
 
     foreach($results as $r) {
       $questions[$r['qid']] = [
         'qid'       => $r['qid'],
+        'gid'       => $r['gid'],
         'type'      => $r['type'],
         'title'     => $r['title'],
         'question'  => $r['question'],

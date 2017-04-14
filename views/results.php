@@ -17,16 +17,30 @@
 
         foreach($colleges as $college => $codesToResults) {
           if (!Utils::nullOrEmpty($college)) {
+            $html .=    "<tr>";
+            $html .=      "<td colspan=\"3\"><strong>{$college}</strong></td>";
+            $html .=    "</tr>";
+
             // Multiple Choice questions
+            echo $question['type'];
             if ($question['type'] == 'M') {
+              $html .=    "<tr>";
+              $resultsStr = "";
+              foreach($resultsByCollege as $sgqa => $college) {
+                if (Utils::startsWith($question['gid'], $sgqa)) {
+                  foreach($subQuestions as $qid => $subQuestion) {
+                    if ($subQuestion['parent_qid'] == $question['qid']) {
+                      $html       .=   "<td>{$subQuestion['question']}</td>";
+                      $resultsStr .=   "<td>{}</td>";
+                    }
+                  }
+                }
+              }
+              $html .=    "</tr>";
             }
 
             // Other questions
             else {
-              $html .=    "<tr>";
-              $html .=      "<td colspan=\"3\"><strong>{$college}</strong></td>";
-              $html .=    "</tr>";
-
               $html .=    "<tr>";
               $resultsStr = "";
               foreach($choices as $code => $answer) {
