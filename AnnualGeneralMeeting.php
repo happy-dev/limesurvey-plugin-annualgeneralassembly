@@ -59,10 +59,10 @@ class AnnualGeneralMeeting extends PluginBase {
           'help'  => gT("Renseignez les pondérations des différents collèges pour le calcul des votes en AG. Exemple : 0.2"),
           'current' => $this->get('weights', 'Survey', $event->get('survey'), $this->defaultSettings),
         ),
-        'college' => array(
-          'type'  =>'int',
-          'label' => gT('ID de la question cachée contenant les collèges'),
-          'current' => $this->get('college', 'Survey', $event->get('survey'), 0),
+        'collegeSGQA' => array(
+          'type'  =>'string',
+          'label' => gT('SQGA de la question cachée contenant les collèges'),
+          'current' => $this->get('collegeSGQA', 'Survey', $event->get('survey'), ""),
         ),
       )
      ));
@@ -119,8 +119,8 @@ class AnnualGeneralMeeting extends PluginBase {
     Yii::import('AnnualGeneralMeeting.helpers.Results');
 
     $settings = [
-      'weights' => $this->get('weights', 'Survey', $surveyId),
-      'college' => $this->get('college', 'Survey', $surveyId),
+      'weights'     => $this->get('weights', 'Survey', $surveyId),
+      'collegeSGQA' => $this->get('collegeSGQA', 'Survey', $surveyId),
     ];
     $Results  = new Results($surveyId, $settings);
 

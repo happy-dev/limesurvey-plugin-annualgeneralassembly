@@ -5,18 +5,14 @@
  */
 class Results {
   protected $surveyId     = 0;
-  protected $collegeQid   = 0;
-  protected $weights      = [];
+  protected $collegeSGQA   = 0;
+  protected $weights      = null;
   
 
   public function __construct($surveyId, $settings) {
-    $this->surveyId     = $surveyId;
-    $this->collegeQid   = $settings['college'];
-    $this->weights      = json_decode($settings['weights']);
-
-    print_r($this->collegeQid);
-    echo '<br/>';
-    print_r($this->weights);
+    $this->surveyId       = $surveyId;
+    $this->collegeSGQA    = $settings['collegeSGQA'];
+    $this->weights        = json_decode($settings['weights']);
   }
 
 
@@ -25,15 +21,14 @@ class Results {
     //$survey->getAttributes();// Get attributes values
     //$survey->metaData->columns;// Columns
     //$survey->search();// Data provider to Reponses grid widget
+    //$totalAnswers           = $survey->count();
+    //$totalCompletedAnswers  = $survey->count('submitdate IS NOT NULL');
 
     $survey           = SurveyDynamic::model($this->surveyId);
     $questions        = $this->getQuestions(); 
     $questionsIds     = array_keys($questions);
     $choices          = $this->getChoices(implode(',', $questionsIds));
     $answers          = $this->getAnswers();
-    $people           = $this->getPeople($answers);
-    $answers          = $this->getAnswers();// Required, as rewinding is not an option
-    $tokensToColleges = $this->getTokensToColleges($people);
     $sgqaStart        = $this->getSGQAStart();
     $resultsByCollege = [];
     $startIndex       = 0;
@@ -49,23 +44,19 @@ class Results {
           if (!isset($resultsByCollege[$sgqa])) {
             $resultsByCollege[$sgqa] = [];
           }
-          if (!isset($resultsByCollege[$sgqa][$tokensToColleges[$answer['token']]])) {
-            $resultsByCollege[$sgqa][ $tokensToColleges[ $answer['token'] ] ] = [];
+          if (!isset($resultsByCollege[$sgqa][$answer[$this->collegeSGQA]])) {
+            $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]] = [];
           }
-          if (!isset($resultsByCollege[$sgqa][$tokensToColleges[$answer['token']]][$code])) {
-            $resultsByCollege[$sgqa][ $tokensToColleges[ $answer['token'] ] ][$code] = 0;
+          if (!isset($resultsByCollege[$sgqa][$answer[$this->collegeSGQA]][$code])) {
+            $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]][$code] = 0;
           }
-          $resultsByCollege[$sgqa][ $tokensToColleges[ $answer['token'] ] ][$code]++;
+          $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]][$code]++;
         }
       }
     }
 
-    $totalAnswers           = $survey->count();
-    $totalCompletedAnswers  = $survey->count('submitdate IS NOT NULL');
 
     return array(
-      'totalAnswers'              => $totalAnswers,
-      'totalCompletedAnswers'     => $totalCompletedAnswers,
       'questions'                 => $questions,
       'choices'                   => $choices,
       'sgqaStart'                 => $sgqaStart,
@@ -111,33 +102,6 @@ class Results {
     $query      = "SELECT * FROM {{survey_$this->surveyId}}";
 
     return  Yii::app()->db->createCommand($query)->query();
-  }
-
-
-  // Returns people who responded to the survey
-  public function getPeople($answers) {
-    $tokens     = [];
-    $tokensStr  = '';
-
-    foreach($answers as $answer) {
-      $tokens[] = $answer['token'];
-    }
-
-    $tokensStr  = "'". implode("','", $tokens) ."'"; 
-    $query      = "SELECT token, {$this->collegeField} FROM {{tokens_$this->surveyId}} WHERE token IN ({$tokensStr})";
-
-    return  Yii::app()->db->createCommand($query)->query();
-  }
-
-
-  public function getTokensToColleges($people) {
-    $tokensToColleges = [];
-
-    foreach($people as $p) {
-      $tokensToColleges[$p['token']] = $p[$this->collegeField];
-    }
-
-    return $tokensToColleges;
   }
 
 
