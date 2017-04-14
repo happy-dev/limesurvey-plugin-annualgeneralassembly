@@ -12,33 +12,43 @@
         $html .=      "<td colspan=\"3\">{$question['title']}. {$question['question']}</td>";
         $html .=    "</tr>";
 
-        $colleges   = current($resultsByCollege);
+        $colleges     = current($resultsByCollege);
+        $emptyCollege = 0;
 
         foreach($colleges as $college => $codesToResults) {
           if (!Utils::nullOrEmpty($college)) {
-            $html .=    "<tr>";
-            $html .=      "<td colspan=\"3\"><strong>{$college}</strong></td>";
-            $html .=    "</tr>";
-
-            $html .=    "<tr>";
-            $resultsStr = "";
-            foreach($choices as $code => $answer) {
-              $results = current($codesToResults);
-
-              $html    .=   "<td>{$answer}</td>";
-              $resultsStr .=   "<td>{$codesToResults[$code]}</td>";
-
-              next($codesToResults);
+            // Multiple Choice questions
+            if ($question['type'] == 'M') {
             }
-            $html .=    "</tr>";
 
-            $html .=    "<tr>";
-            $html .=      $resultsStr;
-            $html .=    "</tr>";
+            // Other questions
+            else {
+              $html .=    "<tr>";
+              $html .=      "<td colspan=\"3\"><strong>{$college}</strong></td>";
+              $html .=    "</tr>";
 
-            $html .=    "<tr>";
-            $html .=    "<td>&nbsp;</td>";
-            $html .=    "</tr>";
+              $html .=    "<tr>";
+              $resultsStr = "";
+              foreach($choices as $code => $answer) {
+                if (!Utils::nullOrEmpty($code)) {// We filter out empty votes
+                  $result      = isset($codesToResults[$code]) ? $codesToResults[$code] : 0;
+                  $html       .=   "<td>{$answer}</td>";
+                  $resultsStr .=   "<td>{$result}</td>";
+                }
+              }
+              $html .=    "</tr>";
+
+              $html .=    "<tr>";
+              $html .=      $resultsStr;
+              $html .=    "</tr>";
+
+              $html .=    "<tr>";
+              $html .=    "<td>&nbsp;</td>";
+              $html .=    "</tr>";
+            }
+          }
+          else {
+            $emptyCollege++;
           }
 
           next($colleges);
@@ -48,6 +58,10 @@
         $html .=  "<br/><br/><br/><br/>";
 
         next($resultsByCollege);
+      }
+
+      if ($emptyCollege > 0) {
+        $html .= "<p>". gT("Attention, {$emptyCollege} réponses ne possèdent aucun collège renseigné.") ."</p>";
       }
 
       echo $html;

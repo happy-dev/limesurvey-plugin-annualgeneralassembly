@@ -27,7 +27,7 @@ class Results {
     $survey           = SurveyDynamic::model($this->surveyId);
     $questions        = $this->getQuestions(); 
     $questionsIds     = array_keys($questions);
-    $choices          = $this->getChoices(implode(',', $questionsIds));
+    $choices          = $this->getMultipleChoices(implode(',', $questionsIds));
     $answers          = $this->getAnswers();
     $sgqaStart        = $this->getSGQAStart();
     $resultsByCollege = [];
@@ -67,13 +67,14 @@ class Results {
 
   // Returns resolutions only of the given survey
   public function getQuestions() {
-    $query      = "SELECT qid, title, question FROM {{questions}} WHERE parent_qid=0 AND sid='{$this->surveyId}' AND title LIKE 'R%' ORDER BY gid, question_order ASC";
+    $query      = "SELECT qid, type, title, question FROM {{questions}} WHERE parent_qid=0 AND sid='{$this->surveyId}' AND title LIKE 'R%' ORDER BY gid, question_order ASC";
     $results    =  Yii::app()->db->createCommand($query)->query();
     $questions  = [];
 
     foreach($results as $r) {
       $questions[$r['qid']] = [
         'qid'       => $r['qid'],
+        'type'      => $r['type'],
         'title'     => $r['title'],
         'question'  => $r['question'],
       ];
@@ -84,7 +85,7 @@ class Results {
 
 
   // Returns possible choices for a given question (multiple choice question) 
-  public function getChoices($questionsIds) {// Questions Ids
+  public function getMultipleChoices($questionsIds) {// Questions Ids
     $query      = "SELECT code, answer FROM {{answers}} WHERE qid IN ({$questionsIds}) ORDER BY code ASC";
     $answers    =  Yii::app()->db->createCommand($query)->query();
     $choices    = [ null => "N'a pas voté"];
