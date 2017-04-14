@@ -9,7 +9,7 @@ class AnnualGeneralMeeting extends PluginBase {
   static protected $name        = '';
   static protected $description = '';
   protected $storage            = 'DbStorage';
-  protected $defaultSettings    = '{"Consommateurs": 1, "Salariés": 2, "Producteurs": 3}';
+  protected $defaultSettings    = '{"Consommateurs": 0.2, "Salariés": 0.2, "Producteurs": 0.6}';
   
 
   public function __construct(PluginManager $manager, $id) {
@@ -53,11 +53,16 @@ class AnnualGeneralMeeting extends PluginBase {
       'name' => get_class($this),
       'settings' => array(
         'weights'=>array(
-          'type'=>'json',
-          'label'=> gT('Pondérations par collège'),
-          'editorOptions'=>array('mode'=>'tree'),
-          'help'=> gT("Renseignez les pondérations des différents collèges pour le calcul des votes en AG"),
+          'type'  =>'json',
+          'label' => gT('Pondérations par collège'),
+          'editorOptions' =>array('mode'=>'tree'),
+          'help'  => gT("Renseignez les pondérations des différents collèges pour le calcul des votes en AG. Exemple : 0.2"),
           'current' => $this->get('weights', 'Survey', $event->get('survey'), $this->defaultSettings),
+        ),
+        'college' => array(
+          'type'  =>'int',
+          'label' => gT('ID de la question cachée contenant les collèges'),
+          'current' => $this->get('college', 'Survey', $event->get('survey'), 0),
         ),
       )
      ));
@@ -113,7 +118,11 @@ class AnnualGeneralMeeting extends PluginBase {
     Yii::setPathOfAlias('AnnualGeneralMeeting', dirname(__FILE__));
     Yii::import('AnnualGeneralMeeting.helpers.Results');
 
-    $Results = new Results($surveyId);
+    $settings = [
+      'weights' => $this->get('weights', 'Survey', $surveyId),
+      'college' => $this->get('college', 'Survey', $surveyId),
+    ];
+    $Results  = new Results($surveyId, $settings);
 
     return $this->renderPartial('results', $Results->getResultsData(), true);
   }

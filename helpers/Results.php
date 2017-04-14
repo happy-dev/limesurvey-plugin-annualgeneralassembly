@@ -5,11 +5,18 @@
  */
 class Results {
   protected $surveyId     = 0;
-  protected $collegeField = 'attribute_3';
+  protected $collegeQid   = 0;
+  protected $weights      = [];
   
 
-  public function __construct($surveyId) {
-    $this->surveyId = $surveyId;
+  public function __construct($surveyId, $settings) {
+    $this->surveyId     = $surveyId;
+    $this->collegeQid   = $settings['college'];
+    $this->weights      = json_decode($settings['weights']);
+
+    print_r($this->collegeQid);
+    echo '<br/>';
+    print_r($this->weights);
   }
 
 
@@ -32,6 +39,7 @@ class Results {
     $startIndex       = 0;
 
     Yii::import('AnnualGeneralMeeting.helpers.Utils');
+
 
     // Computing results
     foreach($answers as $answer) {
