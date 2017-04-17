@@ -12,7 +12,7 @@ class Results {
   public function __construct($surveyId, $settings) {
     $this->surveyId       = $surveyId;
     $this->collegeSGQA    = $settings['collegeSGQA'];
-    $this->weights        = json_decode($settings['weights']);
+    $this->weights        = json_decode($settings['weights'], true);
   }
 
 
@@ -24,64 +24,37 @@ class Results {
     //$totalAnswers           = $survey->count();
     //$totalCompletedAnswers  = $survey->count('submitdate IS NOT NULL');
 
-    $survey           = SurveyDynamic::model($this->surveyId);
-    $questions        = $this->getQuestions(); 
-    $subQuestions     = $this->getQuestions(true); 
-    $questionsIds     = array_keys($questions);
-    $choices          = $this->getMultipleChoices(implode(',', $questionsIds));
-    $answers          = $this->getAnswers();
-    $sgqaStart        = $this->getSGQAStart();
-    $resultsByCollege = [];
-    $startIndex       = 0;
-
     Yii::import('AnnualGeneralMeeting.helpers.Utils');
 
-
-    // Computing results
-    foreach($answers as $answer) {
-      foreach($answer as $sgqa => $code) {
-
-        if (Utils::startsByOneOfThese($sgqa, $sgqaStart)) {
-          if (!isset($resultsByCollege[$sgqa])) {
-            $resultsByCollege[$sgqa] = [];
-          }
-          if (!isset($resultsByCollege[$sgqa][$answer[$this->collegeSGQA]])) {
-            $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]] = [];
-          }
-          if (!isset($resultsByCollege[$sgqa][$answer[$this->collegeSGQA]][$code])) {
-            $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]][$code] = 0;
-          }
-          $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]][$code]++;
-        }
-      }
-    }
-
+    $survey             = SurveyDynamic::model($this->surveyId);
+    $questions          = $this->getQuestions(); 
+    $subQuestions       = $this->getQuestions(true); 
+    $questionsIds       = array_keys($questions);
+    $choices            = $this->getMultipleChoices(implode(',', $questionsIds));
+    $answers            = $this->getAnswers();
+    $resultsByCollege   = $this->getResultsByCollege($answers);
+    $resultsByQuestion  = $this->getResultsByQuestion($questions, $choices, $resultsByCollege);
 
     return array(
+      'surveyId'                  => $this->surveyId,
       'questions'                 => $questions,
       'subQuestions'              => $subQuestions,
       'choices'                   => $choices,
-      'sgqaStart'                 => $sgqaStart,
       'resultsByCollege'          => $resultsByCollege,
+      'resultsByQuestion'         => $resultsByQuestion,
     );
   }
 
 
   // Returns resolutions or subquestions of the given survey
-  public function getQuestions($subquestions = false) {
+  public function getQuestions($sub = false) {
     $s          = $sub ? '!' : '';
-    $query      = "SELECT qid, qid, type, title, question FROM {{questions}} WHERE parent_qid{$s}=0 AND sid='{$this->surveyId}' ORDER BY gid, question_order ASC";
+    $query      = "SELECT qid, gid, parent_qid, type, title, question FROM {{questions}} WHERE parent_qid{$s}=0 AND sid='{$this->surveyId}' ORDER BY gid, question_order ASC";
     $results    =  Yii::app()->db->createCommand($query)->query();
     $questions  = [];
 
     foreach($results as $r) {
-      $questions[$r['qid']] = [
-        'qid'       => $r['qid'],
-        'gid'       => $r['gid'],
-        'type'      => $r['type'],
-        'title'     => $r['title'],
-        'question'  => $r['question'],
-      ];
+      $questions[$r['qid']] = $r;
     }
 
     return $questions;
@@ -120,5 +93,72 @@ class Results {
     }
 
     return $SGQAs;
+  }
+
+
+  // Computing results by colleges
+  public function getResultsByCollege($answers) {
+    $sgqaStart        = $this->getSGQAStart();
+    $resultsByCollege = [];
+
+    foreach($answers as $answer) {
+      foreach($answer as $sgqa => $code) {
+
+        if (Utils::startsByOneOfThese($sgqa, $sgqaStart)) {
+          if (!isset($resultsByCollege[$sgqa])) {
+            $resultsByCollege[$sgqa] = [];
+          }
+          if (!isset($resultsByCollege[$sgqa][$answer[$this->collegeSGQA]])) {
+            $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]]           = [];
+            $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]]['total']  = 0;
+          }
+          if (!isset($resultsByCollege[$sgqa][$answer[$this->collegeSGQA]][$code])) {
+            $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]][$code] = 0;
+          }
+          $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]][$code]++;
+
+          if (!Utils::nullOrEmpty($code)) {// We filter out empty answers
+            $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]]['total']++;
+          }
+        }
+      }
+    }
+
+    return $resultsByCollege;
+  }
+
+
+  // Computing results by questions
+  public function getResultsByQuestion($questions, $choices, $resultsByCollege) {
+    $resultsByQuestion = [];
+
+    foreach($questions as $question) {
+      $resultsByQuestion[ $question['qid'] ]['total'] = 0;
+      $colleges = $resultsByCollege[$this->surveyId .'X'. $question['gid'] .'X'. $question['qid']];
+
+      foreach($colleges as $college => $codesToResults) {
+        foreach($choices as $code => $answer) {
+          $percentage = Utils::percentage($codesToResults[$code], $codesToResults['total']);
+
+          if (!isset($resultsByQuestion[ $question['qid'] ][$code])) {
+            $resultsByQuestion[ $question['qid'] ][$code] = [
+              'total'   => 0,
+              'result'  => 0,
+            ];
+          }
+          $resultsByQuestion[ $question['qid'] ][$code]['total'] += $codesToResults[$code];
+          $resultsByQuestion[ $question['qid'] ]['total']        += $codesToResults[$code];
+
+          if (isset($this->weights[$college])) {
+            $resultsByQuestion[ $question['qid'] ][$code]['result']  += round($percentage * $this->weights[$college], 2);
+          }
+          else {
+            die( gT("La pondération pour le collège '{$college}' n'est pas définie.") );
+          }
+        }
+      }
+    }
+
+    return $resultsByQuestion;
   }
 }

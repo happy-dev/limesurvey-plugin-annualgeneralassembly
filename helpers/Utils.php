@@ -23,4 +23,17 @@ class Utils {
   public static function nullOrEmpty($x) {
     return (!isset($x) || trim($x) === '');
   }
+
+
+  // Returns a 1 digit float 
+  public static function percentage($x, $total) {
+    if (!isset($x)) {
+      return 0;
+    }
+    else if (!isset($total) || $total == 0) {
+      $total = 1;
+    }
+
+    return ($x/$total)*100;// Number
+  }
 }
