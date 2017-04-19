@@ -26,14 +26,15 @@ class Results {
 
     Yii::import('AnnualGeneralMeeting.helpers.Utils');
 
-    $survey             = SurveyDynamic::model($this->surveyId);
-    $questions          = $this->getQuestions(); 
-    $subQuestions       = $this->getQuestions(true); 
-    $questionsIds       = array_keys($questions);
-    $choices            = $this->getMultipleChoices(implode(',', $questionsIds));
-    $answers            = $this->getAnswers();
-    $resultsByCollege   = $this->getResultsByCollege($answers);
-    $resultsByQuestion  = $this->getResultsByQuestion($questions, $choices, $resultsByCollege);
+    $survey               = SurveyDynamic::model($this->surveyId);
+    $questions            = $this->getQuestions(); 
+    $subQuestions         = $this->getQuestions(true); 
+    $questionsIds         = array_keys($questions);
+    $choices              = $this->getMultipleChoices(implode(',', $questionsIds));
+    $answers              = $this->getAnswers();
+    $resultsByCollege     = $this->getResultsByCollege($answers);
+    $resultsByQuestion    = $this->getResultsByQuestion($questions, $choices, $resultsByCollege);
+    $resultsBySubquestion = $this->getResultsBySubQuestion($subQuestions, $resultsByCollege);
 
     return array(
       'surveyId'                  => $this->surveyId,
@@ -175,7 +176,7 @@ class Results {
           $resultsByQuestion[ $question['qid'] ]['total']        += $codesToResults[$code];
 
           if (isset($this->weights[$college])) {
-            $resultsByQuestion[ $question['qid'] ][$code]['result']  += round($percentage * $this->weights[$college], 3);
+            $resultsByQuestion[ $question['qid'] ][$code]['result']  += round($percentage * $this->weights[$college], 2);
           }
           else {
             die( gT("La pondération pour le collège '{$college}' n'est pas définie.") );
@@ -185,5 +186,48 @@ class Results {
     }
 
     return $resultsByQuestion;
+  }
+
+
+  // Computing results by subquestions
+  public function getResultsBySubquestion($subQuestions, $resultsByCollege) {
+    $resultsBySubQuestion = [];
+
+    foreach($subQuestions as $subQuestion) {
+      if (!isset($resultsBySubQuestion[$subQuestion['parent_qid']])) {
+        $resultsBySubQuestion[$subQuestion['parent_qid']] = ['total' => 0];
+      }
+
+      $parentSGQA = $this->surveyId .'X'. $subQuestion['gid'] .'X'. $subQuestion['qid'];
+      $colleges   = $resultsByCollege[$parentSGQA];
+
+      foreach($colleges as $college => $sgqas) {
+        foreach($sgqas as $sgqa => $choices) {
+          if (!isset($resultsBySubQuestion[$subQuestion['parent_qid']][$sgqa])) {
+            $resultsBySubQuestion[$subQuestion['parent_qid']][$sgqa] = [
+              'total'   => 0,
+              'result'  => 0,
+            ];
+          }
+
+          if ($sgqa != 'total') {
+            $percentage = Utils::percentage($choices['V'], $sgqas['total']);
+            $result     = isset($choices['Y']) ? $choices['Y'] : 0;
+
+            $resultsBySubQuestion[$subQuestion['parent_qid']][$sgqa]['total'] += $result;
+            $resultsBySubQuestion[$subQuestion['parent_qid']]['total']        += $result;
+
+            if (isset($this->weights[$college])) {
+              $resultsBySubQuestion[$subQuestion['parent_qid']][$sgqa]['result']  += round($percentage * $this->weights[$college], 2);
+            }
+            else {
+              die( gT("La pondération pour le collège '{$college}' n'est pas définie.") );
+            }
+          }
+        }
+      }
+    }
+
+    return $resultsBySubquestion;
   }
 }

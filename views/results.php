@@ -22,7 +22,7 @@
           $html .=      "<td></td>";
           foreach($subQuestions as $qid => $subQuestion) {
             if ($subQuestion['parent_qid'] == $question['qid']) {
-              $html .=   "<td><strong>{$subQuestion['question']}</strong></td>";
+              $html .=   "<td colspan=\"2\"><strong>{$subQuestion['question']}</strong></td>";
             }
           }
           $html .=      "<td><strong>". gT("Total") ."</strong></td>";
@@ -39,6 +39,7 @@
               if ($sgqa != 'total') {
                 $result = isset($choices['Y']) ? $choices['Y'] : 0;
                 $html .=  "<td>{$result}</td>";
+                $html .=  "<td>". round(Utils::percentage($result, $sgqas['total']), 2) ."%</td>";
               }
               else {
                 $total = $choices;
