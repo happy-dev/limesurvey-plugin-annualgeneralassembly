@@ -55,16 +55,17 @@
           $html .=    "<tr>";
           $html .=      "<td><strong>". gT("Résultats") ."</strong></td>";
 
-          $total = 0;
-          foreach($choices as $code => $answer) {
-            if (!Utils::nullOrEmpty($code)) {// We filter out empty votes
-              $html .=  "<td>{$resultsByQuestion[$question['qid']][$code]['total']}</td>";
-              $html .=  "<td><strong>". round($resultsByQuestion[$question['qid']][$code]['result'], 2) ."%</strong></td>";
-              $total += $resultsByQuestion[$question['qid']][$code]['total'];
+          $sqs = $resultsBySubQuestion[$question['qid']];// SubQuestions
+          foreach($subQuestions as $qid => $subQuestion) {
+            if ($subQuestion['parent_qid'] == $question['qid']) {
+              $numbers = $sqs[$qid];
+
+              $html .=  "<td>{$numbers['total']}</td>";
+              $html .=  "<td><strong>". round($numbers['result'], 2) ."%</strong></td>";
             }
           }
 
-          $html .=      "<td colspan=\"2\">{$total}</td>";
+          $html .=      "<td colspan=\"2\">{$sqs['total']}</td>";
           $html .=    "</tr>";
         }
         else {// Radiobox questions (votes for resolutions)
@@ -115,16 +116,14 @@
           $html .=    "<tr>";
           $html .=      "<td><strong>". gT("Résultats") ."</strong></td>";
 
-          $total = 0;
           foreach($choices as $code => $answer) {
             if (!Utils::nullOrEmpty($code)) {// We filter out empty votes
               $html .=  "<td>{$resultsByQuestion[$question['qid']][$code]['total']}</td>";
               $html .=  "<td><strong>". round($resultsByQuestion[$question['qid']][$code]['result'], 2) ."%</strong></td>";
-              $total += $resultsByQuestion[$question['qid']][$code]['total'];
             }
           }
 
-          $html .=      "<td colspan=\"2\">{$total}</td>";
+          $html .=      "<td colspan=\"2\">{$resultsByQuestion[$question['qid']]['total']}</td>";
           $html .=    "</tr>";
         }
 
