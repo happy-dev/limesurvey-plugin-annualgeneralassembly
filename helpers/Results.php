@@ -105,20 +105,45 @@ class Results {
       foreach($answer as $sgqa => $code) {
 
         if (Utils::startsByOneOfThese($sgqa, $sgqaStart)) {
-          if (!isset($resultsByCollege[$sgqa])) {
-            $resultsByCollege[$sgqa] = [];
-          }
-          if (!isset($resultsByCollege[$sgqa][$answer[$this->collegeSGQA]])) {
-            $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]]           = [];
-            $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]]['total']  = 0;
-          }
-          if (!isset($resultsByCollege[$sgqa][$answer[$this->collegeSGQA]][$code])) {
-            $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]][$code] = 0;
-          }
-          $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]][$code]++;
+          if (false == strpos($sgqa, 'SQ')) {// Radiobox questions (resolutions)
+            if (!isset($resultsByCollege[$sgqa])) {
+              $resultsByCollege[$sgqa] = [];
+            }
+            if (!isset($resultsByCollege[$sgqa][$answer[$this->collegeSGQA]])) {
+              $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]]           = [];
+              $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]]['total']  = 0;
+            }
+            if (!isset($resultsByCollege[$sgqa][$answer[$this->collegeSGQA]][$code])) {
+              $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]][$code] = 0;
+            }
+            $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]][$code]++;
 
-          if (!Utils::nullOrEmpty($code)) {// We filter out empty answers
-            $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]]['total']++;
+            if (!Utils::nullOrEmpty($code)) {// We filter out empty answers
+              $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]]['total']++;
+            }
+          }
+          else {// Checkboxes questions (administrators election)
+            $array      = explode('SQ', $sgqa);
+            $parentSGQA = $array[0];
+
+            if (!isset($resultsByCollege[$parentSGQA])) {
+              $resultsByCollege[$parentSGQA] = [];
+            }
+            if (!isset($resultsByCollege[$parentSGQA][$answer[$this->collegeSGQA]])) {
+              $resultsByCollege[$parentSGQA][$answer[$this->collegeSGQA]]           = [];
+              $resultsByCollege[$parentSGQA][$answer[$this->collegeSGQA]]['total']  = 0;
+            }
+            if (!isset($resultsByCollege[$parentSGQA][$answer[$this->collegeSGQA]][$sgqa])) {
+              $resultsByCollege[$parentSGQA][$answer[$this->collegeSGQA]][$sgqa] = [];
+            }
+            if (!isset($resultsByCollege[$parentSGQA][$answer[$this->collegeSGQA]][$sgqa][$code])) {
+              $resultsByCollege[$parentSGQA][$answer[$this->collegeSGQA]][$sgqa][$code] = 0;
+            }
+            $resultsByCollege[$parentSGQA][$answer[$this->collegeSGQA]][$sgqa][$code]++;
+
+            if (!Utils::nullOrEmpty($code)) {// We filter out empty answers
+              $resultsByCollege[$parentSGQA][$answer[$this->collegeSGQA]]['total']++;
+            }
           }
         }
       }
@@ -150,7 +175,7 @@ class Results {
           $resultsByQuestion[ $question['qid'] ]['total']        += $codesToResults[$code];
 
           if (isset($this->weights[$college])) {
-            $resultsByQuestion[ $question['qid'] ][$code]['result']  += round($percentage * $this->weights[$college], 2);
+            $resultsByQuestion[ $question['qid'] ][$code]['result']  += round($percentage * $this->weights[$college], 3);
           }
           else {
             die( gT("La pondération pour le collège '{$college}' n'est pas définie.") );
