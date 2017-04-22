@@ -1,0 +1,27 @@
+{
+  "name": "annualgeneralmeeting",
+  "version": "1.0.0",
+  "description": "General Assembly meetings votes made easy",
+  "main": "AnnualGeneralMeeting.php",
+  "dependencies": {
+    "chart.js": "^2.5.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/happy-dev/limesurvey-plugin-annualgeneralassembly.git"
+  },
+  "keywords": [
+    "limesurvey",
+    "plugin"
+  ],
+  "author": "Alexandre Bourlier",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/happy-dev/limesurvey-plugin-annualgeneralassembly/issues"
+  },
+  "homepage": "https://github.com/happy-dev/limesurvey-plugin-annualgeneralassembly#readme"
+}
