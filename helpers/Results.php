@@ -210,18 +210,13 @@ class Results {
 
       $parentSGQA = $this->surveyId .'X'. $subQuestion['gid'] .'X'. $subQuestion['parent_qid'];
       $sgqa       = $parentSGQA . $subQuestion['title'];
-      echo '<br/>';
-      echo $parentSGQA .'<br/>';
       $colleges   = $resultsByCollege[$parentSGQA];
 
       foreach($colleges as $college => $sgqas) {
         $choices = $colleges[$college][$sgqa];
-        echo $college .'<br/>';
 
         $result     = isset($choices['Y']) ? $choices['Y'] : 0;
-        echo $sgqa .' - '. $result .' - '. $sgqas['total'] .' - ';
         $percentage = Utils::percentage($result, $sgqas['total']);
-        echo $percentage .'<br/>';
 
         $resultsBySubQuestion[$subQuestion['parent_qid']]['total']        += $result;
         $resultsBySubQuestion[$subQuestion['parent_qid']][$subQuestion['qid']]['total'] += $result;

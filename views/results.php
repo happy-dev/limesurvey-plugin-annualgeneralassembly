@@ -35,14 +35,14 @@
             $html .=    "<td>{$college}</td>";
 
             $total = 0;
-            foreach($sgqas as $sgqa => $choices) {
+            foreach($sgqas as $sgqa => $chs) {
               if ($sgqa != 'total') {
-                $result = isset($choices['Y']) ? $choices['Y'] : 0;
+                $result = isset($chs['Y']) ? $chs['Y'] : 0;
                 $html .=  "<td>{$result}</td>";
                 $html .=  "<td>". round(Utils::percentage($result, $sgqas['total']), 2) ."%</td>";
               }
               else {
-                $total = $choices;
+                $total = $chs;
               }
             }
 
@@ -68,6 +68,7 @@
           $html .=      "<td colspan=\"2\">{$sqs['total']}</td>";
           $html .=    "</tr>";
         }
+
         else {// Radiobox questions (votes for resolutions)
           $html .=  "<table>";
           $html .=    "<tr>";
