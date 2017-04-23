@@ -5,7 +5,7 @@
  */
 class Results {
   protected $surveyId     = 0;
-  protected $collegeSGQA   = 0;
+  protected $collegeSGQA  = 0;
   protected $weights      = null;
   
 
@@ -38,6 +38,7 @@ class Results {
 
     return array(
       'surveyId'                  => $this->surveyId,
+      'collegeSGQA'               => $this->collegeSGQA,
       'questions'                 => $questions,
       'subQuestions'              => $subQuestions,
       'choices'                   => $choices,

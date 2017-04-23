@@ -120,7 +120,7 @@ class AnnualGeneralMeeting extends PluginBase {
 
     $assetsPath = Yii::app()->assetManager->publish(dirname(__FILE__));
     App()->getClientScript()->registerScriptFile($assetsPath . '/node_modules/chart.js/dist/Chart.min.js');
-    App()->getClientScript()->registerScriptFile($assetsPath . '/js/result.js');
+    App()->getClientScript()->registerScriptFile($assetsPath . '/js/results.js');
 
     $settings = [
       'weights'     => $this->get('weights', 'Survey', $surveyId),

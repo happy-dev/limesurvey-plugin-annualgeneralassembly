@@ -8,10 +8,15 @@
 
       foreach($questions as $question) {
         $question['sgqa'] = $surveyId .'X'. $question['gid'] .'X'. $question['qid'];
+
+        if ($question['sgqa'] == $collegeSGQA) {// Skipping the college question
+          continue;
+        }
+
         $emptyCollege     = 0;
         $firstCollege     = true;
 
-        $html .= '<canvas id="donut-'. $question['sgqa'] .'" data-sgqa="'. $question['sgqa'] .'" width="400" height="400"></canvas>';// Donut chart
+        $html .= '<canvas id="donut-'. $question['sgqa'] .'" data-sgqa="'. $question['sgqa'] .'"></canvas>';// Donut chart
 
         if ($question['type'] == 'M') {// Multiple Choice questions (votes for administrators)
           $html .=  "<table>";
@@ -78,6 +83,7 @@
           $html .=    "</tr>";
 
           $colleges = $resultsByCollege[$question['sgqa']];
+
           foreach($colleges as $college => $codesToResults) {
 
             if (!Utils::nullOrEmpty($college)) {// If college unknown, we can't include your vote...
