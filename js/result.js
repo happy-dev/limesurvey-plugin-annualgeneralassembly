@@ -1,6 +1,8 @@
 (function ( $ ) {
   $(document).ready(function() {
 
+    Chart.defaults.global.defaultFontSize = 14;
+
     // Displays donut charts
     $("canvas").each(function(idx, ctx) {
       var data = getDataFromDOM($(ctx).data("sgqa"));

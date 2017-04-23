@@ -1,0 +1,8 @@
+.table-responsive {
+  overflow-x: auto;
+}
+
+canvas {
+  max-width:    768px;
+  max-height:   768px;
+}
