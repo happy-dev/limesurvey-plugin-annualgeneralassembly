@@ -118,6 +118,10 @@ class AnnualGeneralMeeting extends PluginBase {
     Yii::setPathOfAlias('AnnualGeneralMeeting', dirname(__FILE__));
     Yii::import('AnnualGeneralMeeting.helpers.Results');
 
+    $assetsPath = Yii::app()->assetManager->publish(dirname(__FILE__));
+    App()->getClientScript()->registerScriptFile($assetsPath . '/node_modules/chart.js/dist/Chart.min.js');
+    App()->getClientScript()->registerScriptFile($assetsPath . '/js/result.js');
+
     $settings = [
       'weights'     => $this->get('weights', 'Survey', $surveyId),
       'collegeSGQA' => $this->get('collegeSGQA', 'Survey', $surveyId),

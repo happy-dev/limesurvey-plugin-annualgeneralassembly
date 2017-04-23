@@ -11,6 +11,8 @@
         $emptyCollege     = 0;
         $firstCollege     = true;
 
+        $html .= '<canvas id="donut-'. $question['sgqa'] .'" data-sgqa="'. $question['sgqa'] .'" width="400" height="400"></canvas>';// Donut chart
+
         if ($question['type'] == 'M') {// Multiple Choice questions (votes for administrators)
           $html .=  "<table>";
           $html .=    "<tr>";
@@ -22,7 +24,7 @@
           $html .=      "<td></td>";
           foreach($subQuestions as $qid => $subQuestion) {
             if ($subQuestion['parent_qid'] == $question['qid']) {
-              $html .=   "<td colspan=\"2\"><strong>{$subQuestion['question']}</strong></td>";
+              $html .=   "<td colspan=\"2\"><strong class=\"label-{$question['sgqa']}\">{$subQuestion['question']}</strong></td>";
             }
           }
           $html .=      "<td><strong>". gT("Total") ."</strong></td>";
@@ -61,7 +63,7 @@
               $numbers = $sqs[$qid];
 
               $html .=  "<td>{$numbers['total']}</td>";
-              $html .=  "<td><strong>". round($numbers['result'], 2) ."%</strong></td>";
+              $html .=  "<td><strong><span class=\"data-{$question['sgqa']}\">". round($numbers['result'], 2) ."</span>%</strong></td>";
             }
           }
 
@@ -84,7 +86,7 @@
                 $html .=      "<td></td>";
                   foreach($choices as $code => $answer) {
                     if (!Utils::nullOrEmpty($code)) {// We filter out empty votes
-                      $html .=   "<td colspan=\"2\"><strong>{$answer}</strong></td>";
+                      $html .=   "<td colspan=\"2\"><strong class=\"label-{$question['sgqa']}\">{$answer}</strong></td>";
                     }
                   }
                 $html .=      "<td><strong>". gT("Total") ."</strong></td>";
@@ -120,7 +122,7 @@
           foreach($choices as $code => $answer) {
             if (!Utils::nullOrEmpty($code)) {// We filter out empty votes
               $html .=  "<td>{$resultsByQuestion[$question['qid']][$code]['total']}</td>";
-              $html .=  "<td><strong>". round($resultsByQuestion[$question['qid']][$code]['result'], 2) ."%</strong></td>";
+              $html .=  "<td><strong><span class=\"data-{$question['sgqa']}\">". round($resultsByQuestion[$question['qid']][$code]['result'], 2) ."</span>%</strong></td>";
             }
           }
 
