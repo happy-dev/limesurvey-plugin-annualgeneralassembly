@@ -15,8 +15,7 @@ foreach($questions as $question) {
   $html .=  '<li role="presentation" class="'. $at .'">';
   $html .=    '<a href="#qid-'. $question['qid'] .'" class="'. $at .'" aria-controls="'. $question['title'] .'" role="tab" data-toggle="tab">'. $question['title'] .'</a>';
   $html .=  '</li>';
-  $at    =  '';
-}
+  $at    =  ''; }
 $html .= '</ul>';
 
 
@@ -32,9 +31,11 @@ foreach($questions as $question) {
   }
   
   $html .= '<div role="tabpanel" class="tab-pane '. $at .'" id="qid-'. $question['qid'] .'">';
-  $html .=  "<p>{$question['question']}</p>";
+  $html .=    '<div class="row">';
+  $html .=      "<div class=\"col-sm-6\">{$question['question']}</div>";
 
-  $html .=  '<canvas id="donut-'. $question['sgqa'] .'" data-sgqa="'. $question['sgqa'] .'"></canvas>';// Donut chart
+  $html .=      '<canvas id="donut-'. $question['sgqa'] .'" data-sgqa="'. $question['sgqa'] .'" class="col-sm-6"></canvas>';// Donut chart
+  $html .=    '</div>';// .row
 
   $html .=  '<div class="table-responsive">';
   $html .=  "<table class=\"table table-bordered table-hover table-condensed\">";
