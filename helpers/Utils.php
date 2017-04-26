@@ -1,6 +1,7 @@
 <?php
-
+// Useful PHP functions
 class Utils {
+
   // Returns a boolean telling if the $haystack starts with the $needle
   public static function startsWith($needle, $haystack) {
    $length = strlen($needle);

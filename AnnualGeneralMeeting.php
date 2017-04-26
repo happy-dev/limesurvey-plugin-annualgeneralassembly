@@ -10,6 +10,7 @@ class AnnualGeneralMeeting extends PluginBase {
   static protected $description = '';
   protected $storage            = 'DbStorage';
   protected $defaultSettings    = '{"Consommateurs": 0.2, "Salariés": 0.2, "Producteurs": 0.6}';
+  protected $href               = [];// Uri defined by the plugin
   
 
   public function __construct(PluginManager $manager, $id) {
@@ -91,23 +92,40 @@ class AnnualGeneralMeeting extends PluginBase {
       if (isset($weights) && $weights !== $this->defaultSettings) {
         $surveyId = $event->get('surveyId');
 
-        $href = Yii::app()->createUrl(
-          'admin/pluginhelper',
-          array(
-            'sa' => 'sidebody',// sidebody || fullpagewrapper
-            'plugin' => 'AnnualGeneralMeeting',
-            'method' => 'outputResults',
-            'surveyId' => $surveyId
-          )
-        );
+        $href = [
+          'outputResults' =>  Yii::app()->createUrl(
+            'admin/pluginhelper',
+            array(
+              'sa' => 'sidebody',// sidebody || fullpagewrapper
+              'plugin' => 'AnnualGeneralMeeting',
+              'method' => 'outputResults',
+              'surveyId' => $surveyId
+            )
+          ),
+          'insertVotes' =>  Yii::app()->createUrl(
+            'admin/pluginhelper',
+            array(
+              'sa' => 'sidebody',// sidebody || fullpagewrapper
+              'plugin' => 'AnnualGeneralMeeting',
+              'method' => 'insertVotes',
+              'surveyId' => $surveyId
+            )
+          ),
+        ];
+        $this->$href = $href;
 
-        $menuItem = new MenuItem(array(
-          'label' => gT('AG'),
-          'iconClass' => 'fa fa-magic',
-          'href' => $href
-        ));
-
-        $event->append('menuItems', array($menuItem));
+        $event->append('menuItems', [
+          new MenuItem(array(
+            'label' => gT('Résultats AG'),
+            'iconClass' => 'fa fa-magic',
+            'href' => $href['outputResults'],
+          )),
+          new MenuItem(array(
+            'label' => gT('Ajouter des votes'),
+            'iconClass' => 'fa fa-plus',
+            'href' => $href['insertVotes'],
+          )),
+        ]);
       }
     }
   }
@@ -130,5 +148,19 @@ class AnnualGeneralMeeting extends PluginBase {
     $Results  = new Results($surveyId, $settings);
 
     return $this->renderPartial('results', $Results->getResultsData(), true);
+  }
+
+
+  // Outputs the HTML of the "Insert Votes" page
+  public function insertVotes($surveyId) {
+    Yii::setPathOfAlias('AnnualGeneralMeeting', dirname(__FILE__));
+    Yii::import('AnnualGeneralMeeting.helpers.InsertVotes');
+
+    $assetsPath = Yii::app()->assetManager->publish(dirname(__FILE__));
+    App()->getClientScript()->registerCssFile($assetsPath . '/css/insertVote.css');
+
+    $InsertVotes  = new InsertVotes($surveyId, $href['insertVotes']);
+
+    return $this->renderPartial('insertVotes', $InsertVotes->getFormData(), true);
   }
 }

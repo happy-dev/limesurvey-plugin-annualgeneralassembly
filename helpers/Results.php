@@ -25,12 +25,14 @@ class Results {
     //$totalCompletedAnswers  = $survey->count('submitdate IS NOT NULL');
 
     Yii::import('AnnualGeneralMeeting.helpers.Utils');
+    Yii::import('AnnualGeneralMeeting.helpers.LSUtils');
 
+    $LSUtils              = new LSUtils($this->surveyId);
     $survey               = SurveyDynamic::model($this->surveyId);
-    $questions            = $this->getQuestions(); 
-    $subQuestions         = $this->getQuestions(true); 
+    $questions            = $LSUtils->getQuestions(); 
+    $subQuestions         = $LSUtils->getQuestions(true); 
     $questionsIds         = array_keys($questions);
-    $choices              = $this->getMultipleChoices(implode(',', $questionsIds));
+    $choices              = $LSUtils->getMultipleChoices(implode(',', $questionsIds));
     $answers              = $this->getAnswers();
     $resultsByCollege     = $this->getResultsByCollege($answers);
     $resultsByQuestion    = $this->getResultsByQuestion($questions, $choices, $resultsByCollege);
@@ -46,35 +48,6 @@ class Results {
       'resultsByQuestion'         => $resultsByQuestion,
       'resultsBySubQuestion'      => $resultsBySubQuestion,
     );
-  }
-
-
-  // Returns resolutions or subquestions of the given survey
-  public function getQuestions($sub = false) {
-    $s          = $sub ? '!' : '';
-    $query      = "SELECT qid, gid, parent_qid, type, title, question FROM {{questions}} WHERE parent_qid{$s}=0 AND sid='{$this->surveyId}' ORDER BY gid, question_order ASC";
-    $results    =  Yii::app()->db->createCommand($query)->query();
-    $questions  = [];
-
-    foreach($results as $r) {
-      $questions[$r['qid']] = $r;
-    }
-
-    return $questions;
-  }
-
-
-  // Returns possible choices for a given question (multiple choice question) 
-  public function getMultipleChoices($questionsIds) {// Questions Ids
-    $query      = "SELECT code, answer FROM {{answers}} WHERE qid IN ({$questionsIds}) ORDER BY code ASC";
-    $answers    =  Yii::app()->db->createCommand($query)->query();
-    $choices    = [ null => "N'a pas voté"];
-
-    foreach($answers as $answer) {
-      $choices[$answer['code']] = $answer['answer'];
-    }
-
-    return $choices;
   }
 
 
@@ -166,7 +139,7 @@ class Results {
       $colleges = $resultsByCollege[$this->surveyId .'X'. $question['gid'] .'X'. $question['qid']];
 
       foreach($colleges as $college => $codesToResults) {
-        foreach($choices as $code => $answer) {
+        foreach($choices[$question['qid']] as $code => $answer) {
           if (!Utils::nullOrEmpty($code) && $code != 'total') {
             $percentage = Utils::percentage($codesToResults[$code], $codesToResults['total']);
 

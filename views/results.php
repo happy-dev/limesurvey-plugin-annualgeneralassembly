@@ -102,7 +102,7 @@ foreach($questions as $question) {
         if ($firstCollege) {// First line of the table
           $html .=    "<tr class=\"active\">";
           $html .=      "<td></td>";
-            foreach($choices as $code => $answer) {
+            foreach($choices[$question['qid']] as $code => $answer) {
               if (!Utils::nullOrEmpty($code)) {// We filter out empty votes
                 $html .=   "<td colspan=\"2\"><strong class=\"label-{$question['sgqa']}\">{$answer}</strong></td>";
               }
@@ -114,7 +114,7 @@ foreach($questions as $question) {
         $html .=    "<tr>";
         $html .=      "<td><strong>{$college}</strong></td>";
 
-        foreach($choices as $code => $answer) {
+        foreach($choices[$question['qid']] as $code => $answer) {
           if (!Utils::nullOrEmpty($code)) {// We filter out empty votes
             $result  = isset($codesToResults[$code]) ? $codesToResults[$code] : 0;
             $html   .=   "<td>{$result}</td>";
@@ -137,7 +137,7 @@ foreach($questions as $question) {
     $html .=    "<tr class=\"info\">";
     $html .=      "<td><strong>". gT("Résultats") ."</strong></td>";
 
-    foreach($choices as $code => $answer) {
+    foreach($choices[$question['qid']] as $code => $answer) {
       if (!Utils::nullOrEmpty($code)) {// We filter out empty votes
         $html .=  "<td>{$resultsByQuestion[$question['qid']][$code]['total']}</td>";
         $html .=  "<td><strong><span class=\"data-{$question['sgqa']}\">". round($resultsByQuestion[$question['qid']][$code]['result'], 2) ."</span>%</strong></td>";
