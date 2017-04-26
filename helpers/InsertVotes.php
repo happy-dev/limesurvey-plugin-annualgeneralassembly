@@ -35,7 +35,7 @@ class InsertVotes {
       'questions'                 => $questions,
       'subQuestions'              => $subQuestions,
       'choices'                   => $choices,
-      'sgqas'                     => json_encode(implode(',', $sgqas)),
+      'sgqas'                     => json_encode($sgqas),
     );
   }
 

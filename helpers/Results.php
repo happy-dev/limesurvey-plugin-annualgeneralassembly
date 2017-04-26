@@ -139,24 +139,28 @@ class Results {
       $colleges = $resultsByCollege[$this->surveyId .'X'. $question['gid'] .'X'. $question['qid']];
 
       foreach($colleges as $college => $codesToResults) {
-        foreach($choices[$question['qid']] as $code => $answer) {
-          if (!Utils::nullOrEmpty($code) && $code != 'total') {
-            $percentage = Utils::percentage($codesToResults[$code], $codesToResults['total']);
+        $codes = isset($choices[$question['qid']]) ? $choices[$question['qid']] : null;
 
-            if (!isset($resultsByQuestion[ $question['qid'] ][$code])) {
-              $resultsByQuestion[ $question['qid'] ][$code] = [
-                'total'   => 0,
-                'result'  => 0,
-              ];
-            }
-            $resultsByQuestion[ $question['qid'] ][$code]['total'] += $codesToResults[$code];
-            $resultsByQuestion[ $question['qid'] ]['total']        += $codesToResults[$code];
+        if (isset($codes)) {
+          foreach($codes as $code => $answer) {
+            if (isset($codesToResults[$code]) && $code != 'total') {
+              $percentage = Utils::percentage($codesToResults[$code], $codesToResults['total']);
 
-            if (isset($this->weights[$college])) {
-              $resultsByQuestion[ $question['qid'] ][$code]['result']  += $percentage * $this->weights[$college];
-            }
-            else {
-              die( gT("La pondération pour le collège '{$college}' n'est pas définie.") );
+              if (!isset($resultsByQuestion[ $question['qid'] ][$code])) {
+                $resultsByQuestion[ $question['qid'] ][$code] = [
+                  'total'   => 0,
+                  'result'  => 0,
+                ];
+              }
+              $resultsByQuestion[ $question['qid'] ][$code]['total'] += $codesToResults[$code];
+              $resultsByQuestion[ $question['qid'] ]['total']        += $codesToResults[$code];
+
+              if (isset($this->weights[$college])) {
+                $resultsByQuestion[ $question['qid'] ][$code]['result']  += $percentage * $this->weights[$college];
+              }
+              else {
+                die( gT("La pondération pour le collège '{$college}' n'est pas définie.") );
+              }
             }
           }
         }
@@ -187,19 +191,21 @@ class Results {
       $colleges   = $resultsByCollege[$parentSGQA];
 
       foreach($colleges as $college => $sgqas) {
-        $choices = $colleges[$college][$sgqa];
+        if (isset($colleges[$college][$sgqa])) {
+          $choices = $colleges[$college][$sgqa];
 
-        $result     = isset($choices['Y']) ? $choices['Y'] : 0;
-        $percentage = Utils::percentage($result, $sgqas['total']);
+          $result     = isset($choices['Y']) ? $choices['Y'] : 0;
+          $percentage = Utils::percentage($result, $sgqas['total']);
 
-        $resultsBySubQuestion[$subQuestion['parent_qid']]['total']        += $result;
-        $resultsBySubQuestion[$subQuestion['parent_qid']][$subQuestion['qid']]['total'] += $result;
+          $resultsBySubQuestion[$subQuestion['parent_qid']]['total']        += $result;
+          $resultsBySubQuestion[$subQuestion['parent_qid']][$subQuestion['qid']]['total'] += $result;
 
-        if (isset($this->weights[$college])) {
-          $resultsBySubQuestion[$subQuestion['parent_qid']][$subQuestion['qid']]['result']  += $percentage * $this->weights[$college];
-        }
-        else {
-          die( gT("La pondération pour le collège '{$college}' n'est pas définie.") );
+          if (isset($this->weights[$college])) {
+            $resultsBySubQuestion[$subQuestion['parent_qid']][$subQuestion['qid']]['result']  += $percentage * $this->weights[$college];
+          }
+          else {
+            die( gT("La pondération pour le collège '{$college}' n'est pas définie.") );
+          }
         }
       }
     }

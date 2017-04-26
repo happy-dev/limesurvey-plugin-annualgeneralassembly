@@ -3,6 +3,7 @@
 <?php
 $html  =  '';
 $html .=  '<form method="post" action="'. $href .'" class="form-horizontal" id="insert-votes">';
+$html .=  '<div id="console"></div>';
 $html .=    '<span class="hidden" id="sgqas">'. $sgqas .'</span>';
 $html .=    '<input type="hidden" value="'. Yii::app()->request->csrfToken .'" name="YII_CSRF_TOKEN">';
 $html .=    '<input type="hidden" value="'. $surveyId .'" name="survey_id" id="survey_id">';
@@ -34,7 +35,7 @@ foreach($questions as $question) {
     foreach($answers as $code => $answer) {
       $html .=  '<label for="number_of_votes" class="col-xs-2 control-label">'. $answer .'</label>';
       $html .=  '<div class="col-xs-1">';
-      $html .=    '<input type="number" name="'. $question['sgqa'] .'-'. $code .'" class="form-control" value="0" />';
+      $html .=    '<input type="number" name="'. $question['sgqa'] .'-'. $code .'" data-sgqa="'. $question['sgqa'] .'" class="form-control" value="0" />';
       $html .=  '</div>';
     }
   }
@@ -52,7 +53,7 @@ foreach($questions as $question) {
         $html .=    $subQuestion['question'];
         $html .=  '</label>';
         $html .=  '<div class="col-xs-1">';
-        $html .=    '<input type="number" name="'. $subQuestion['sgqa'] .'" class="form-control" value="0" />';
+        $html .=    '<input type="number" name="'. $subQuestion['sgqa'] .'" data-sgqa="'. $subQuestion['sgqa'] .'" class="form-control" value="0" />';
         $html .=  '</div>';
         $idx  +=  3;
       }
@@ -65,7 +66,7 @@ foreach($questions as $question) {
   $html .=    gT('Total');
   $html .=  '</label>';
   $html .=  '<div class="col-xs-1">';
-  $html .=    '<input type="number" name="total-'. $question['sgqa'] .'" class="form-control" value="0" disabled/>';
+  $html .=    '<input type="number" name="total-'. $question['sgqa'] .'" data-sgqa="'. $question['sgqa'] .'" class="form-control" value="0" readonly/>';
   $html .=  '</div>';
   $html .= '</div>';// .row
 

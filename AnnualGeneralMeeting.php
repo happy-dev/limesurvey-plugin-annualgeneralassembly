@@ -10,7 +10,6 @@ class AnnualGeneralMeeting extends PluginBase {
   static protected $description = '';
   protected $storage            = 'DbStorage';
   protected $defaultSettings    = '{"Consommateurs": 0.2, "Salariés": 0.2, "Producteurs": 0.6}';
-  protected $href               = [];// Uri defined by the plugin
   
 
   public function __construct(PluginManager $manager, $id) {
@@ -111,7 +110,6 @@ class AnnualGeneralMeeting extends PluginBase {
             )
           ),
         ];
-        $this->href = $href;
 
         $event->append('menuItems', [
           new MenuItem(array(
@@ -159,7 +157,17 @@ class AnnualGeneralMeeting extends PluginBase {
     App()->getClientScript()->registerScriptFile($assetsPath . '/js/insertVotes.js');
     App()->getClientScript()->registerCssFile($assetsPath . '/css/insertVote.css');
 
-    $InsertVotes  = new InsertVotes($surveyId, $href['insertVotes']);
+    $href =  Yii::app()->createUrl(
+      'admin/pluginhelper',
+      array(
+        'sa' => 'sidebody',// sidebody || fullpagewrapper
+        'plugin' => 'AnnualGeneralMeeting',
+        'method' => 'insertVotes',
+        'surveyId' => $surveyId
+      )
+    );
+
+    $InsertVotes  = new InsertVotes($surveyId, $href);
 
     return $this->renderPartial('insertVotes', $InsertVotes->getFormData(), true);
   }
