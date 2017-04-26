@@ -27,6 +27,7 @@ class InsertVotes {
     $subQuestions         = $LSUtils->getQuestions(true); 
     $questionsIds         = array_keys($questions);
     $choices              = $LSUtils->getMultipleChoices(implode(',', $questionsIds));
+    $sgqas                = $LSUtils->getSGQAs($questions);
 
     return array(
       'surveyId'                  => $this->surveyId,
@@ -34,6 +35,7 @@ class InsertVotes {
       'questions'                 => $questions,
       'subQuestions'              => $subQuestions,
       'choices'                   => $choices,
+      'sgqas'                     => json_encode(implode(',', $sgqas)),
     );
   }
 

@@ -48,4 +48,16 @@ class LSUtils {
 
     return $this->surveyId .'X'. $question['gid'] .'X'. $question['qid'] . $title;
   }
+
+
+  // Collects questions SGQA codes into an array
+  public function getSGQAs($questions) {
+    $sgqas = [];
+
+    foreach($questions as $question) {
+      $sgqas[] = $this->getSGQA($question);
+    }
+
+    return $sgqas;
+  }
 }

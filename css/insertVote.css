@@ -2,6 +2,10 @@
   margin-bottom : 70px;
 }
 
+#insert-votes .form-group .row {
+  margin-bottom : 10px;
+}
+
 #insert-votes .question {
   margin-bottom : 20px;
 }

@@ -21,7 +21,6 @@ class AnnualGeneralMeeting extends PluginBase {
 
     $this->subscribe('beforeSurveySettings');
     $this->subscribe('newSurveySettings');
-    $this->subscribe('beforeControllerAction');
     $this->subscribe('beforeToolsMenuRender');
   }
 
@@ -112,7 +111,7 @@ class AnnualGeneralMeeting extends PluginBase {
             )
           ),
         ];
-        $this->$href = $href;
+        $this->href = $href;
 
         $event->append('menuItems', [
           new MenuItem(array(
@@ -157,6 +156,7 @@ class AnnualGeneralMeeting extends PluginBase {
     Yii::import('AnnualGeneralMeeting.helpers.InsertVotes');
 
     $assetsPath = Yii::app()->assetManager->publish(dirname(__FILE__));
+    App()->getClientScript()->registerScriptFile($assetsPath . '/js/insertVotes.js');
     App()->getClientScript()->registerCssFile($assetsPath . '/css/insertVote.css');
 
     $InsertVotes  = new InsertVotes($surveyId, $href['insertVotes']);
