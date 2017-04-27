@@ -16,10 +16,11 @@ $(document).ready(function() {
 
 
   inputs.on("change", function(e) {
+    if ($(e.currentTarget).attr("id") != "number_of_votes") {
+      computeTotal(e);
+    }
+
     if (formSubmited) {
-      if ($(e.currentTarget).attr("id") != "number_of_votes") {
-        computeTotal(e);
-      }
       verifyTotals();
     }
   });
@@ -30,7 +31,7 @@ $(document).ready(function() {
     formSubmited = true;
     verifyTotals();
 
-    if (!formValid) {
+    if (!formValid) {// We display error messages
       if (Number(numberOfVotesEl.val()) == 0) {
         alertsTemplates.find("#total-equals-zero").clone().appendTo(alertsWrapper);
       }
@@ -43,6 +44,11 @@ $(document).ready(function() {
         alertsWrapper.find(".close").click();
       }, 5000);
     }
+
+    else {// We submit the form
+      FORM.off("submit");
+      FORM.submit();
+    }
   });
 
 
@@ -52,7 +58,7 @@ $(document).ready(function() {
     var sgqa      = input.data("sgqa");
     var startSgqa = sgqa.split('SQ')[0];
     var total     = 0;
-    var totalEl   = FORM.find('input[name="total-'+ sgqa +'"]');
+    var totalEl   = FORM.find('input[name="total-'+ startSgqa +'"]');
 
     FORM.find('input[name^="'+ startSgqa +'"]').each(function(idx, el) {
       total += Number(el.value);

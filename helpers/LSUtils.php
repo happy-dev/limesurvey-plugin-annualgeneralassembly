@@ -42,11 +42,12 @@ class LSUtils {
 
   // Get the SGQA for a given (sub)question
   public function getSGQA($question) {
-    Yii::import('AnnualGeneralMeeting.helpers.Utils');
-
-    $title = Utils::startsWith('SQ', $question['title']) ? $question['title'] : '';
-
-    return $this->surveyId .'X'. $question['gid'] .'X'. $question['qid'] . $title;
+    if ($question['type'] == 'M' && $question['parent_qid'] != 0) {
+      return $this->surveyId .'X'. $question['gid'] .'X'. $question['parent_qid'] . $question['title'];
+    }
+    else {
+      return $this->surveyId .'X'. $question['gid'] .'X'. $question['qid'];
+    }
   }
 
 

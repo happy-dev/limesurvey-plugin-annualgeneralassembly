@@ -38,16 +38,16 @@ $html .=      '<div class="row">';
 $html .=        '<label for="batch_name" class="col-xs-2 control-label">';
 $html .=          gT('Nom unique');
 $html .=        '</label>';
-$html .=        '<div class="col-xs-2">';
-$html .=          '<input type="text" name="batch_name" class="form-control" />';
+$html .=        '<div class="col-xs-3">';
+$html .=          '<input type="text" name="batch_name" class="form-control" placeholder="Pouvoirs du président" maxlength="20" required />';
 $html .=        '</div>';
 $html .=      '</div>';
 $html .=      '<div class="row">';
 $html .=        '<label for="number_of_votes" class="col-xs-2 control-label">';
 $html .=          gT('Nombre total de votes');
 $html .=        '</label>';
-$html .=        '<div class="col-xs-2">';
-$html .=          '<input type="number" name="number_of_votes" class="form-control" value="0" id="number_of_votes"/>';
+$html .=        '<div class="col-xs-3">';
+$html .=          '<input type="number" name="number_of_votes" class="form-control" value="0" required id="number_of_votes"/>';
 $html .=        '</div>';
 $html .=      '</div>';
 $html .=    '</div>';// .form-group
@@ -61,7 +61,7 @@ foreach($questions as $question) {
     foreach($answers as $code => $answer) {
       $html .=  '<label for="number_of_votes" class="col-xs-2 control-label">'. $answer .'</label>';
       $html .=  '<div class="col-xs-1">';
-      $html .=    '<input type="number" name="'. $question['sgqa'] .'-'. $code .'" data-sgqa="'. $question['sgqa'] .'" class="form-control" value="0" />';
+      $html .=    '<input type="number" name="'. $question['sgqa'] .'-'. $code .'" data-sgqa="'. $question['sgqa'] .'" class="form-control" value="0" required />';
       $html .=  '</div>';
     }
   }
@@ -79,7 +79,7 @@ foreach($questions as $question) {
         $html .=    $subQuestion['question'];
         $html .=  '</label>';
         $html .=  '<div class="col-xs-1">';
-        $html .=    '<input type="number" name="'. $subQuestion['sgqa'] .'" data-sgqa="'. $subQuestion['sgqa'] .'" class="form-control" value="0" />';
+        $html .=    '<input type="number" name="'. $subQuestion['sgqa'] .'" data-sgqa="'. $subQuestion['sgqa'] .'" class="form-control" value="0" required />';
         $html .=  '</div>';
         $idx  +=  3;
       }
