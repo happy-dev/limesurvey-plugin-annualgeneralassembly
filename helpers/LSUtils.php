@@ -3,17 +3,21 @@
 // Useful LimeSurvey PHP functions
 class LSUtils {
   protected $surveyId     = 0;
+  protected $collegeSGQA  = '';
 
 
-  public function __construct($surveyId) {
+  public function __construct($surveyId, $collegeSGQA) {
     $this->surveyId       = $surveyId;
+    $this->collegeSGQA    = $collegeSGQA;
   }
 
 
   // Returns resolutions or subquestions of the given survey
   public function getQuestions($sub = false) {
     $s          = $sub ? '!' : '';
-    $query      = "SELECT qid, gid, parent_qid, type, title, question FROM {{questions}} WHERE parent_qid{$s}=0 AND sid='{$this->surveyId}' ORDER BY gid, question_order ASC";
+    $tmp        = explode('X', $this->collegeSGQA);
+    $qid        = $tmp[count($tmp) - 1];
+    $query      = "SELECT qid, gid, parent_qid, type, title, question FROM {{questions}} WHERE parent_qid{$s}=0 AND sid='{$this->surveyId}' AND qid!='{$qid}' ORDER BY gid, question_order ASC";
     $results    =  Yii::app()->db->createCommand($query)->query();
     $questions  = [];
 

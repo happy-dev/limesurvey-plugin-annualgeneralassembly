@@ -154,7 +154,7 @@ class AnnualGeneralMeeting extends PluginBase {
     Yii::import('AnnualGeneralMeeting.helpers.InsertVotes');
 
     $assetsPath = Yii::app()->assetManager->publish(dirname(__FILE__));
-    App()->getClientScript()->registerScriptFile($assetsPath . '/js/insertVotes.js');
+    App()->getClientScript()->registerScriptFile($assetsPath . '/js/insertVote.js');
     App()->getClientScript()->registerCssFile($assetsPath . '/css/insertVote.css');
 
     $href =  Yii::app()->createUrl(
@@ -167,7 +167,11 @@ class AnnualGeneralMeeting extends PluginBase {
       )
     );
 
-    $InsertVotes  = new InsertVotes($surveyId, $href);
+    $InsertVotes  = new InsertVotes($surveyId, [
+      'weights'       =>  $this->get('weights', 'Survey', $surveyId),
+      'href'          =>  $href,
+      'collegeSGQA'   =>  $this->get('collegeSGQA', 'Survey', $surveyId),
+    ]);
 
     return $this->renderPartial('insertVotes', $InsertVotes->getFormData(), true);
   }

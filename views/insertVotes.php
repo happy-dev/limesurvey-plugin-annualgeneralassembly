@@ -11,6 +11,13 @@
       <span>Les votes ont été enregistrés avec succès !</span>
     </div>
 
+    <div id="wrong-name" class="alert alert-danger alert-dismissable fade in" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true" class="">&times;</span>
+      </button>
+      <span>Le nom renseigné est déjà utilisé. Veuillez essayer autre chose.</span>
+    </div>
+
     <div id="total-equals-zero" class="alert alert-danger alert-dismissable fade in" role="alert">
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true" class="">&times;</span>
@@ -33,13 +40,26 @@ $html .=  '<div id="console"></div>';
 $html .=    '<span class="hidden" id="sgqas">'. $sgqas .'</span>';
 $html .=    '<input type="hidden" value="'. Yii::app()->request->csrfToken .'" name="YII_CSRF_TOKEN">';
 $html .=    '<input type="hidden" value="'. $surveyId .'" name="survey_id" id="survey_id">';
+$html .=    '<input type="hidden" value="'. $votesInserted .'" name="votes-inserted" id="votes-inserted">';
 $html .=    '<div class="form-group">';
 $html .=      '<div class="row">';
 $html .=        '<label for="batch_name" class="col-xs-2 control-label">';
 $html .=          gT('Nom unique');
 $html .=        '</label>';
 $html .=        '<div class="col-xs-3">';
-$html .=          '<input type="text" name="batch_name" class="form-control" placeholder="Pouvoirs du président" maxlength="20" required />';
+$html .=          '<input type="text" name="batch-name" id="batch-name" class="form-control" maxlength="20" required />';
+$html .=        '</div>';
+$html .=      '</div>';
+$html .=      '<div class="row">';
+$html .=        '<label for="college" class="col-xs-2 control-label">';
+$html .=          gT('College');
+$html .=        '</label>';
+$html .=        '<div class="col-xs-3">';
+$html .=          '<select name="college" class="form-control" required>';
+foreach($weights as $college => $weight) {
+  $html .= '<option value="'. $college .'">'. $college .'</option>';
+}
+$html .=          '</select>';
 $html .=        '</div>';
 $html .=      '</div>';
 $html .=      '<div class="row">';

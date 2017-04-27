@@ -5,6 +5,8 @@
  */
 class InsertVotes {
   protected $surveyId       = 0;
+  protected $weights        = null;
+  protected $collegeSGQA    = '';
   protected $href           = '';
   protected $lastPage       = 123456789;
   protected $questions      = [];
@@ -14,13 +16,15 @@ class InsertVotes {
   protected $votesInserted  = false;
 
 
-  public function __construct($surveyId, $href) {
+  public function __construct($surveyId, $settings) {
     Yii::import('AnnualGeneralMeeting.helpers.LSUtils');
 
-    $LSUtils              = new LSUtils($surveyId);
+    $LSUtils              = new LSUtils($surveyId, $settings['collegeSGQA']);
 
     $this->surveyId       = $surveyId;
-    $this->href           = $href;
+    $this->weights        = json_decode($settings['weights'], true);
+    $this->collegeSGQA    = $settings['collegeSGQA'];
+    $this->href           = $settings['href'];
     $this->questions      = $LSUtils->getQuestions(); 
     $this->subQuestions   = $LSUtils->getQuestions(true); 
     $questionsIds         = array_keys($this->questions);
@@ -28,7 +32,14 @@ class InsertVotes {
     $this->sgqas          = $LSUtils->getSGQAs($this->questions);
 
     if('POST' == $_SERVER['REQUEST_METHOD']) {
-      $this->processFormData();
+      if (isset($_POST['ajax'])) {
+        $this->checkNameUnicity($_POST['batchName'], true);
+      }
+      else {
+        if (isset($_POST['batch-name']) && $this->checkNameUnicity($_POST['batch-name']) == 0) {
+          $this->processFormData();
+        }
+      }
     }
   }
 
@@ -37,12 +48,29 @@ class InsertVotes {
   public function getFormData() {
     return array(
       'surveyId'                  => $this->surveyId,
+      'weights'                   => $this->weights,
       'href'                      => $this->href,
       'questions'                 => $this->questions,
       'subQuestions'              => $this->subQuestions,
       'choices'                   => $this->choices,
       'sgqas'                     => json_encode($this->sgqas),
+      'votesInserted'             => $this->votesInserted,
     );
+  }
+
+
+  // Check batch name unicity
+  public function checkNameUnicity($name, $echo = false) {
+    $query  = "SELECT startlanguage FROM {{survey_$this->surveyId}} WHERE startlanguage='{$name}'";
+    $result =  Yii::app()->db->createCommand($query)->query();
+
+    if ($echo) {
+      echo $result->count();
+      die();
+    }
+    else {
+      return $result->count();
+    }
   }
 
 
@@ -78,9 +106,10 @@ class InsertVotes {
       $buffer     = [];
       $buffer[]   = "'". $now ."'";// submitdate
       $buffer[]   = $this->lastPage;// lastpage
-      $buffer[]   = "'". $_POST['batch_name'] ."'";// startlanguage
+      $buffer[]   = "'". $_POST['batch-name'] ."'";// startlanguage
       $buffer[]   = "'". $now ."'";// startdate
       $buffer[]   = "'". $now ."'";// datestamp
+      $buffer[]   = "'". $_POST['college'] ."'";
 
       foreach($votes as $sgqa => $codes) {
         foreach($codes as $code => $count) {
@@ -109,7 +138,7 @@ class InsertVotes {
       $values[] = '('. implode(',', $buffer) .')';
     }
 
-    $query      = "INSERT INTO {{survey_$this->surveyId}} (submitdate, lastpage, startlanguage, startdate, datestamp, ". implode(', ', array_keys($votes)) .") VALUES ". implode(', ', $values);
+    $query      = "INSERT INTO {{survey_$this->surveyId}} (submitdate, lastpage, startlanguage, startdate, datestamp, {$this->collegeSGQA}, ". implode(', ', array_keys($votes)) .") VALUES ". implode(', ', $values);
     Yii::app()->db->createCommand($query)->query();
 
     $this->votesInserted = true;

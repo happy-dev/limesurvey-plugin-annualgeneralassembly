@@ -5,7 +5,7 @@
  */
 class Results {
   protected $surveyId     = 0;
-  protected $collegeSGQA  = 0;
+  protected $collegeSGQA  = '';
   protected $weights      = null;
   
 
@@ -27,7 +27,7 @@ class Results {
     Yii::import('AnnualGeneralMeeting.helpers.Utils');
     Yii::import('AnnualGeneralMeeting.helpers.LSUtils');
 
-    $LSUtils              = new LSUtils($this->surveyId);
+    $LSUtils              = new LSUtils($this->surveyId, $this->collegeSGQA);
     $survey               = SurveyDynamic::model($this->surveyId);
     $questions            = $LSUtils->getQuestions(); 
     $subQuestions         = $LSUtils->getQuestions(true); 
