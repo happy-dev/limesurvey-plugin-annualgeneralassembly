@@ -1,3 +1,16 @@
+#insert-votes-page #alerts-wrapper {
+  position :  fixed;
+  z-index :   9999;
+}
+
+#insert-votes-page .alert-danger {
+  background-color : #f2dede;
+}
+
+#insert-votes-page .alert-success {
+  background-color : #dff0d8;
+}
+
 #insert-votes .form-group {
   margin-bottom : 70px;
 }

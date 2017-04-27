@@ -1,6 +1,8 @@
 (function ( $ ) {
 $(document).ready(function() {
 
+  var alertsWrapper   = $("#alerts-wrapper");
+  var alertsTemplates = $("#alerts-templates");
   var FORM            = $("#insert-votes");
   var numberOfVotesEl = FORM.find("#number_of_votes");
   var surveyId        = FORM.find("#survey_id").val();
@@ -8,6 +10,7 @@ $(document).ready(function() {
   var sgqas           = JSON.parse(FORM.find('#sgqas').html());
   var formSubmited    = false;
   var formValid       = false;
+  var timer           = null;
 
   var CONSOLE         = FORM.find("#console");
 
@@ -25,9 +28,20 @@ $(document).ready(function() {
   FORM.on("submit", function(e) {
     e.preventDefault();
     formSubmited = true;
+    verifyTotals();
 
     if (!formValid) {
+      if (Number(numberOfVotesEl.val()) == 0) {
+        alertsTemplates.find("#total-equals-zero").clone().appendTo(alertsWrapper);
+      }
+      else {
+        alertsTemplates.find("#totals-dont-match").clone().appendTo(alertsWrapper);
+      }
 
+      clearTimeout(timer);
+      timer = setTimeout(function() {
+        alertsWrapper.find(".close").click();
+      }, 5000);
     }
   });
 
@@ -60,7 +74,7 @@ $(document).ready(function() {
       var total      = Number(totalInput.val());
       var formGroup  = totalInput.parents(".form-group");
 
-      if (numberOfVotes != 0 && total != 0 && (numberOfVotes > 1 && total % numberOfVotes == 0 || numberOfVotes == 1 && numberOfVotes == total)) {// Could have more than one answer per question
+      if (numberOfVotes != 0 && total != 0 && total % numberOfVotes == 0) {// Could have more than one answer per question
         formGroup.removeClass('has-error').addClass('has-success');
       }
       else {

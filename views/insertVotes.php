@@ -1,4 +1,30 @@
-<h3 class='pagetitle'><?php echo gT("Ajouter des votes") ?></h3>
+<div id="insert-votes-page">
+  <h3 class='pagetitle'><?php echo gT("Ajouter des votes") ?></h3>
+
+  <div id="alerts-wrapper"></div>
+
+  <div id="alerts-templates" class="hidden">
+    <div id="all-good" class="alert alert-success alert-dismissable fade in" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true" class="">&times;</span>
+      </button>
+      <span>Les votes ont été enregistrés avec succès !</span>
+    </div>
+
+    <div id="total-equals-zero" class="alert alert-danger alert-dismissable fade in" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true" class="">&times;</span>
+      </button>
+      <span>Vous devez renseigner un nombre total de votes afin d'évaluer si les nombres renseignés pour chacune des questions sont cohérents</span>
+    </div>
+
+    <div id="totals-dont-match" class="alert alert-danger alert-dismissable fade in" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true" class="">&times;</span>
+      </button>
+      <span>Le nombre de votes que vous souhaitez insérer ne correspond pas au nombre de choix renseignés</span>
+    </div>
+  </div>
 
 <?php
 $html  =  '';
@@ -12,15 +38,15 @@ $html .=      '<div class="row">';
 $html .=        '<label for="batch_name" class="col-xs-2 control-label">';
 $html .=          gT('Nom unique');
 $html .=        '</label>';
-$html .=        '<div class="col-xs-1">';
+$html .=        '<div class="col-xs-2">';
 $html .=          '<input type="text" name="batch_name" class="form-control" />';
 $html .=        '</div>';
 $html .=      '</div>';
 $html .=      '<div class="row">';
 $html .=        '<label for="number_of_votes" class="col-xs-2 control-label">';
-$html .=          gT('Nombre de votes / pouvoirs');
+$html .=          gT('Nombre total de votes');
 $html .=        '</label>';
-$html .=        '<div class="col-xs-1">';
+$html .=        '<div class="col-xs-2">';
 $html .=          '<input type="number" name="number_of_votes" class="form-control" value="0" id="number_of_votes"/>';
 $html .=        '</div>';
 $html .=      '</div>';
@@ -80,3 +106,6 @@ $html .=  '</div>';
 $html .=  '</form>';
 
 echo $html;
+?>
+
+</div><!-- #insert-votes-page -->
