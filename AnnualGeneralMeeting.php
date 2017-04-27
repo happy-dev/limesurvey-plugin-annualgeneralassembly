@@ -155,7 +155,7 @@ class AnnualGeneralMeeting extends PluginBase {
 
     $assetsPath = Yii::app()->assetManager->publish(dirname(__FILE__));
     App()->getClientScript()->registerScriptFile($assetsPath . '/js/insertVote.js');
-    App()->getClientScript()->registerCssFile($assetsPath . '/css/insertVote.css');
+    App()->getClientScript()->registerCssFile($assetsPath . '/css/insertVotes.css');
 
     $href =  Yii::app()->createUrl(
       'admin/pluginhelper',

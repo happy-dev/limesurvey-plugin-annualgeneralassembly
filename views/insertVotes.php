@@ -120,7 +120,7 @@ foreach($questions as $question) {
 }
 
 $html .=  '<div class="form-group">';
-$html .=    '<input type="submit" class="btn btn-primary col-xs-offset-6" value="'. gT('Insérer ces votes') .'"/>';
+$html .=    '<button type="button" data-toggle="modal" data-target="#confirm-submission-modal" class="btn btn-lg btn-primary col-xs-offset-6">'. gT('Insérer ces votes') .'</button>';
 $html .=  '</div>';
 
 $html .=  '</form>';
@@ -128,4 +128,18 @@ $html .=  '</form>';
 echo $html;
 ?>
 
+  <div id="confirm-submission-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Confirmez-vous la sauvegarde de ces votes ?</h4>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">J'annule</button>
+          <button type="button" class="btn btn-primary" id="i-confirm">Je confirme</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
 </div><!-- #insert-votes-page -->

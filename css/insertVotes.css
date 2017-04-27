@@ -1,25 +1,30 @@
+/* Alerts */
 #insert-votes-page #alerts-wrapper {
   position :  fixed;
   z-index :   9999;
 }
-
 #insert-votes-page .alert-danger {
   background-color : #f2dede;
 }
-
 #insert-votes-page .alert-success {
   background-color : #dff0d8;
 }
 
+
+/* Form */
 #insert-votes .form-group {
   margin-bottom : 70px;
 }
-
 #insert-votes .form-group .row {
   margin-bottom : 10px;
 }
-
 #insert-votes .question {
   margin-bottom : 20px;
 }
 
+
+/*  */
+#insert-votes-page .modal-header,
+#insert-votes-page .modal-footer {
+  border : none;
+}

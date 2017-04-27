@@ -3,6 +3,8 @@ $(document).ready(function() {
 
   var alertsWrapper   = $("#alerts-wrapper");
   var alertsTemplates = $("#alerts-templates");
+  var confirmModal    = $("#confirm-submission-modal");
+  var iConfirm        = confirmModal.find("#i-confirm");
   var FORM            = $("#insert-votes");
   var numberOfVotesEl = FORM.find("#number_of_votes");
   var surveyId        = FORM.find("#survey_id").val();
@@ -57,12 +59,13 @@ $(document).ready(function() {
   });
 
 
-  FORM.on("submit", function(e) {
-    e.preventDefault();
+  iConfirm.on("click", function(e) {
     formSubmited = true;
     verifyTotals();
 
     if (!formValid) {// We display error messages
+      confirmModal.modal('hide');
+
       if (Number(numberOfVotesEl.val()) == 0) {
         displayAlert("#total-equals-zero");
       }
@@ -75,7 +78,6 @@ $(document).ready(function() {
     }
 
     else {// We submit the form
-      FORM.off("submit");
       FORM.submit();
     }
   });
