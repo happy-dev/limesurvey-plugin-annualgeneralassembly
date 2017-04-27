@@ -109,6 +109,15 @@ class AnnualGeneralMeeting extends PluginBase {
               'surveyId' => $surveyId
             )
           ),
+          'monitorBatches' =>  Yii::app()->createUrl(
+            'admin/pluginhelper',
+            array(
+              'sa' => 'sidebody',// sidebody || fullpagewrapper
+              'plugin' => 'AnnualGeneralMeeting',
+              'method' => 'monitorBatches',
+              'surveyId' => $surveyId
+            )
+          ),
         ];
 
         $event->append('menuItems', [
@@ -121,6 +130,11 @@ class AnnualGeneralMeeting extends PluginBase {
             'label' => gT('Ajouter des votes'),
             'iconClass' => 'fa fa-plus',
             'href' => $href['insertVotes'],
+          )),
+          new MenuItem(array(
+            'label' => gT('Gestion des votes'),
+            'iconClass' => 'fa fa-eraser',
+            'href' => $href['monitorBatches'],
           )),
         ]);
       }
@@ -174,5 +188,30 @@ class AnnualGeneralMeeting extends PluginBase {
     ]);
 
     return $this->renderPartial('insertVotes', $InsertVotes->getFormData(), true);
+  }
+
+
+  // Outputs the HTML of the "Monitor Batches" page
+  public function monitorBatches($surveyId) {
+    Yii::setPathOfAlias('AnnualGeneralMeeting', dirname(__FILE__));
+    Yii::import('AnnualGeneralMeeting.helpers.MonitorBatches');
+
+    $assetsPath = Yii::app()->assetManager->publish(dirname(__FILE__));
+    App()->getClientScript()->registerScriptFile($assetsPath . '/js/monitorBatches.js');
+    App()->getClientScript()->registerCssFile($assetsPath . '/css/monitorBatche.css');
+    
+    $href =  Yii::app()->createUrl(
+      'admin/pluginhelper',
+      array(
+        'sa' => 'sidebody',// sidebody || fullpagewrapper
+        'plugin' => 'AnnualGeneralMeeting',
+        'method' => 'monitorBatches',
+        'surveyId' => $surveyId
+      )
+    );
+
+    $MonitorBatches  = new MonitorBatches($surveyId, $href);
+
+    return $this->renderPartial('monitorBatches', $MonitorBatches->getFormData(), true);
   }
 }

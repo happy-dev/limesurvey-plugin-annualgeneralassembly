@@ -1,0 +1,6 @@
+/* Modals */
+#monitor-batches-page .modal-header,
+#monitor-batches-page .modal-footer {
+  border : none;
+}
+
