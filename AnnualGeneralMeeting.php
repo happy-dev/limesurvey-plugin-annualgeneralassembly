@@ -60,7 +60,7 @@ class AnnualGeneralMeeting extends PluginBase {
         ),
         'collegeSGQA' => array(
           'type'  =>'string',
-          'label' => gT('SQGA de la question cachée contenant les collèges'),
+          'label' => gT('SGQA de la question cachée contenant les collèges'),
           'current' => $this->get('collegeSGQA', 'Survey', $event->get('survey'), ""),
         ),
       )
