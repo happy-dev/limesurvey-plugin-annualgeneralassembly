@@ -55,22 +55,32 @@ foreach($questions as $question) {
 
     $colleges = $resultsByCollege[$question['sgqa']];
     foreach($colleges as $college => $sgqas) {
+      ksort($sgqas);
+
       $html .=  "<tr>";
       $html .=    "<td>{$college}</td>";
 
       $total = 0;
-      foreach($sgqas as $sgqa => $chs) {
-        if ($sgqa != 'total') {
-          $result = isset($chs['Y']) ? $chs['Y'] : 0;
-          $html .=  "<td>{$result}</td>";
-          $html .=  "<td>". round(Utils::percentage($result, $sgqas['total']), 2) ."%</td>";
-        }
-        else {
-          $total = $chs;
+      foreach($subQuestions as $qid => $subQuestion) {
+        if ($subQuestion['parent_qid'] == $question['qid']) {
+          $chs    = current($sgqas);
+          $sgqa   = key($sgqas);
+
+          if ($subQuestion['sgqa'] == $sgqa) {// If some votes for this answer
+            $result = isset($chs['Y']) ? $chs['Y'] : 0;
+            $html .=  "<td>{$result}</td>";
+            $html .=  "<td>". round(Utils::percentage($result, $sgqas['total']), 2) ."%</td>";
+
+            next($sgqas);
+          }
+          else {// Zero otherwise
+            $html .=  "<td>0</td>";
+            $html .=  "<td>0%</td>";
+          }
         }
       }
 
-      $html .=    "<td>{$total}</td>";
+      $html .=    "<td>{$sgqas['total']}</td>";
       $html .=  "</tr>";
     }
 

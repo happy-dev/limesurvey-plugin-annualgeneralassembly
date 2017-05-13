@@ -191,7 +191,7 @@ class Results {
       $colleges   = $resultsByCollege[$parentSGQA];
 
       foreach($colleges as $college => $sgqas) {
-        if (isset($colleges[$college][$sgqa])) {
+        if (isset($colleges[$college][$sgqa]) && isset($this->weights[$college])) {
           $choices = $colleges[$college][$sgqa];
 
           $result     = isset($choices['Y']) ? $choices['Y'] : 0;
@@ -199,13 +199,7 @@ class Results {
 
           $resultsBySubQuestion[$subQuestion['parent_qid']]['total']        += $result;
           $resultsBySubQuestion[$subQuestion['parent_qid']][$subQuestion['qid']]['total'] += $result;
-
-          if (isset($this->weights[$college])) {
-            $resultsBySubQuestion[$subQuestion['parent_qid']][$subQuestion['qid']]['result']  += $percentage * $this->weights[$college];
-          }
-          else {
-            die( gT("La pondération pour le collège '{$college}' n'est pas définie.") );
-          }
+          $resultsBySubQuestion[$subQuestion['parent_qid']][$subQuestion['qid']]['result']  += $percentage * $this->weights[$college];
         }
       }
     }
