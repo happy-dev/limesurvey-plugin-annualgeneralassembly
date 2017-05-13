@@ -157,7 +157,7 @@ foreach($questions as $question) {
 $html .=  "</div>";// .tab-content
 
 if ($emptyCollege > 0) {
-  $html .= "<p>". gT("Attention, {$emptyCollege} réponses ne possèdent aucun collège renseigné.") ."</p>";
+  $html .= '<br/><p class="text-warning">'. gT("Attention, {$emptyCollege} réponses ne possèdent aucun collège renseigné.") ."</p>";
 }
 
 echo $html;

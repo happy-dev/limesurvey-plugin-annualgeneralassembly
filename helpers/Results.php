@@ -79,7 +79,7 @@ class Results {
 
     foreach($answers as $answer) {
       foreach($answer as $sgqa => $code) {
-        if (!Utils::nullOrEmpty($code)) {
+        if (!Utils::nullOrEmpty($code) && !Utils::nullOrEmpty($answer[$this->collegeSGQA])) {
           if (Utils::startsByOneOfThese($sgqa, $sgqaStart)) {
             if (false == strpos($sgqa, 'SQ')) {// Radiobox questions (resolutions)
               if (!isset($resultsByCollege[$sgqa])) {
