@@ -46,7 +46,7 @@ class LSUtils {
 
   // Get the SGQA for a given (sub)question
   public function getSGQA($question) {
-    if ($question['type'] == 'M' && $question['parent_qid'] != 0) {
+    if (in_array($question['type'], ['M', 'T']) && $question['parent_qid'] != 0) {
       return $this->surveyId .'X'. $question['gid'] .'X'. $question['parent_qid'] . $question['title'];
     }
     else {
