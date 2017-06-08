@@ -53,7 +53,7 @@ class Results {
 
   // Returns answers for a given survey
   public function getAnswers() {
-    $query      = "SELECT * FROM {{survey_$this->surveyId}}";
+    $query      = "SELECT * FROM {{survey_$this->surveyId}} WHERE `submitdate` IS NOT NULL";
 
     return  Yii::app()->db->createCommand($query)->query();
   }
