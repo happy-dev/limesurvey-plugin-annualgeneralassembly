@@ -107,8 +107,6 @@ class InsertVotes {
       $buffer[]   = "'". $now ."'";// submitdate
       $buffer[]   = $this->lastPage;// lastpage
       $buffer[]   = "'". $_POST['batch-name'] ."'";// startlanguage
-      $buffer[]   = "'". $now ."'";// startdate
-      $buffer[]   = "'". $now ."'";// datestamp
       $buffer[]   = "'". $_POST['college'] ."'";
 
       foreach($votes as $sgqa => $codes) {
@@ -116,7 +114,7 @@ class InsertVotes {
           if (strpos($sgqa, 'SQ') == false) {// Resolutions, we skip following choices
             if ($sgqa != $filledSGQA && $count > 0) {
               $filledSGQA = $sgqa;
-              $buffer[]   = $code;
+              $buffer[]   = "'". $code ."'";
 
               $votes[$sgqa][$code]--;
             }
@@ -138,7 +136,7 @@ class InsertVotes {
       $values[] = '('. implode(',', $buffer) .')';
     }
 
-    $query      = "INSERT INTO {{survey_$this->surveyId}} (submitdate, lastpage, startlanguage, startdate, datestamp, {$this->collegeSGQA}, ". implode(', ', array_keys($votes)) .") VALUES ". implode(', ', $values);
+    $query      = "INSERT INTO {{survey_$this->surveyId}} (submitdate, lastpage, startlanguage, {$this->collegeSGQA}, ". implode(', ', array_keys($votes)) .") VALUES ". implode(', ', $values);
     Yii::app()->db->createCommand($query)->query();
 
     $this->votesInserted = true;
