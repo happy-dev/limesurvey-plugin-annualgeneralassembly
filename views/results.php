@@ -69,7 +69,7 @@ foreach($questions as $question) {
           if ($subQuestion['sgqa'] == $sgqa) {// If some votes for this answer
             $result = isset($chs['Y']) ? $chs['Y'] : 0;
             $html .=  "<td>{$result}</td>";
-            $html .=  "<td>". round(Utils::percentage($result, $sgqas['total']), 2) ."%</td>";
+            $html .=  "<td>". round(Utils::percentage($result, $countsByCollege[$college]), 2) ."%</td>";
 
             next($sgqas);
           }

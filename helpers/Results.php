@@ -36,7 +36,8 @@ class Results {
     $answers              = $this->getAnswers();
     $resultsByCollege     = $this->getResultsByCollege($answers);
     $resultsByQuestion    = $this->getResultsByQuestion($questions, $choices, $resultsByCollege);
-    $resultsBySubQuestion = $this->getResultsBySubQuestion($subQuestions, $resultsByCollege);
+    $countsByCollege      = $this->getRespondentsCount($resultsByCollege);
+    $resultsBySubQuestion = $this->getResultsBySubQuestion($subQuestions, $resultsByCollege, $countsByCollege);
 
     return array(
       'surveyId'                  => $this->surveyId,
@@ -44,6 +45,7 @@ class Results {
       'questions'                 => $questions,
       'subQuestions'              => $subQuestions,
       'choices'                   => $choices,
+      'countsByCollege'           => $countsByCollege,
       'resultsByCollege'          => $resultsByCollege,
       'resultsByQuestion'         => $resultsByQuestion,
       'resultsBySubQuestion'      => $resultsBySubQuestion,
@@ -86,8 +88,10 @@ class Results {
                 $resultsByCollege[$sgqa] = [];
               }
               if (!isset($resultsByCollege[$sgqa][$answer[$this->collegeSGQA]])) {
-                $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]]           = [];
-                $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]]['total']  = 0;
+                $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]]              = [];
+                $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]]['total']     = 0;
+                $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]]['adminVote'] = false;
+                $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]]['college']   = $answer[$this->collegeSGQA];
               }
               if (!isset($resultsByCollege[$sgqa][$answer[$this->collegeSGQA]][$code])) {
                 $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]][$code] = 0;
@@ -108,6 +112,7 @@ class Results {
               if (!isset($resultsByCollege[$parentSGQA][$answer[$this->collegeSGQA]])) {
                 $resultsByCollege[$parentSGQA][$answer[$this->collegeSGQA]]           = [];
                 $resultsByCollege[$parentSGQA][$answer[$this->collegeSGQA]]['total']  = 0;
+                $resultsByCollege[$parentSGQA][$answer[$this->collegeSGQA]]['adminVote']= true;
               }
               if (!isset($resultsByCollege[$parentSGQA][$answer[$this->collegeSGQA]][$sgqa])) {
                 $resultsByCollege[$parentSGQA][$answer[$this->collegeSGQA]][$sgqa] = [];
@@ -172,7 +177,7 @@ class Results {
 
 
   // Computing results by subquestions
-  public function getResultsBySubQuestion($subQuestions, $resultsByCollege) {
+  public function getResultsBySubQuestion($subQuestions, $resultsByCollege, $countsByCollege) {
     $resultsBySubQuestion = [];
 
     foreach($subQuestions as $subQuestion) {
@@ -195,7 +200,7 @@ class Results {
           $choices = $colleges[$college][$sgqa];
 
           $result     = isset($choices['Y']) ? $choices['Y'] : 0;
-          $percentage = Utils::percentage($result, $sgqas['total']);
+          $percentage = Utils::percentage($result, $countsByCollege[$college]);
 
           $resultsBySubQuestion[$subQuestion['parent_qid']]['total']        += $result;
           $resultsBySubQuestion[$subQuestion['parent_qid']][$subQuestion['qid']]['total'] += $result;
@@ -205,5 +210,49 @@ class Results {
     }
 
     return $resultsBySubQuestion;
+  }
+
+
+  // Checks which number of respondents seems to be the most frequent comparing 
+  // total number of answers, and then returns that number
+  public function getRespondentsCount($resultsByCollege) {
+    $countsDistribution = [];
+    $countsByCollege    = [];
+
+    // Segmenting counts by college
+    foreach($resultsByCollege as $parentSGQA => $colleges) {
+      foreach($colleges as $key => $college) {
+        if ($college['adminVote'] == false) {// Administrator election
+          if ($key != 'adminVote') {
+            // Counting the different occurences of each count (I know...)
+            if (!isset($countsDistribution[$college['college']][$college['total']])) {
+              $countsDistribution[$college['college']][$college['total']] = [
+                'total' => $college['total'],
+                'count' => 0,
+              ];
+            }
+
+            $countsDistribution[$college['college']][$college['total']]['count']++;
+          }
+        }
+      }
+    }
+
+    // Finding the most frequent one
+    foreach($countsDistribution as $college => $digests) {
+      $mostFrequentCount  = 0;
+      $biggest            = 0;
+
+      foreach($digests as $total => $digest) {
+        if ($digest['count'] > $biggest) {
+          $biggest            = $digest['count'];
+          $mostFrequentCount  = $digest['total'];
+        }
+      }
+
+      $countsByCollege[$college] = $mostFrequentCount;
+    }
+
+    return $countsByCollege;
   }
 }
