@@ -107,16 +107,19 @@ $(document).ready(function() {
     // For each question...
     for(var i=0; i<sgqas.length; i++) {
 
-      var totalInput = FORM.find('input[name="total-'+ sgqas[i] +'"]');
-      var total      = Number(totalInput.val());
-      var formGroup  = totalInput.parents(".form-group");
+      var totalInput = FORM.find('input[name="total-'+ sgqas[i] +'"]:not(.admin)');
 
-      if (numberOfVotes != 0 && total != 0 && total % numberOfVotes == 0) {// Could have more than one answer per question
-        formGroup.removeClass('has-error').addClass('has-success');
-      }
-      else {
-        formGroup.addClass('has-error').removeClass('has-success');
-        formValid = false;
+      if (totalInput.length > 0) {
+        var total      = Number(totalInput.val());
+        var formGroup  = totalInput.parents(".form-group");
+
+        if (numberOfVotes != 0 && total != 0 && total == numberOfVotes) {// Could have more than one answer per question
+          formGroup.removeClass('has-error').addClass('has-success');
+        }
+        else {
+          formGroup.addClass('has-error').removeClass('has-success');
+          formValid = false;
+        }
       }
     }
   }

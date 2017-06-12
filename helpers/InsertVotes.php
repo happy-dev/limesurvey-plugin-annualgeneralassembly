@@ -110,14 +110,22 @@ class InsertVotes {
       $buffer[]   = "'". $_POST['college'] ."'";
 
       foreach($votes as $sgqa => $codes) {
+        $codesLength = count($codes);
+        $idx         = 1;
         foreach($codes as $code => $count) {
           if (strpos($sgqa, 'SQ') == false) {// Resolutions, we skip following choices
-            if ($sgqa != $filledSGQA && $count > 0) {
-              $filledSGQA = $sgqa;
-              $buffer[]   = "'". $code ."'";
+            if ($sgqa != $filledSGQA) {
+              if ($count > 0) {
+                $filledSGQA = $sgqa;
+                $buffer[]   = "'". $code ."'";
 
-              $votes[$sgqa][$code]--;
+                $votes[$sgqa][$code]--;
+              }
+              else if ($idx == $codesLength) {
+                $buffer[]   = "''";
+              }
             }
+            $idx++;
           }
 
           else {

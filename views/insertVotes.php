@@ -77,7 +77,8 @@ foreach($questions as $question) {
   $html .=    '<div class="question">'. $question['title'] . $question['question'] .'</div>';
 
   if ($question['type'] != 'M') {// Radiobox questions (Resolutions)
-    $answers = $choices[$question['qid']];
+    $totalClass = '';
+    $answers    = $choices[$question['qid']];
     foreach($answers as $code => $answer) {
       $html .=  '<label for="number_of_votes" class="col-xs-2 control-label">'. $answer .'</label>';
       $html .=  '<div class="col-xs-1">';
@@ -87,6 +88,7 @@ foreach($questions as $question) {
   }
 
   else {// Checkbox questions (Administrators vote)
+    $totalClass = 'admin';
     $html .= '<div class="row">';
     $idx   = 0;
     foreach($subQuestions as $subQuestion) {
@@ -112,7 +114,7 @@ foreach($questions as $question) {
   $html .=    gT('Total');
   $html .=  '</label>';
   $html .=  '<div class="col-xs-1">';
-  $html .=    '<input type="number" name="total-'. $question['sgqa'] .'" data-sgqa="'. $question['sgqa'] .'" class="form-control" value="0" readonly/>';
+  $html .=    '<input type="number" name="total-'. $question['sgqa'] .'" data-sgqa="'. $question['sgqa'] .'" class="form-control '. $totalClass .'" value="0" readonly/>';
   $html .=  '</div>';
   $html .= '</div>';// .row
 
