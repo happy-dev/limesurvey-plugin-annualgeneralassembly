@@ -6,9 +6,10 @@ class LSUtils {
   protected $collegeSGQA  = '';
 
 
-  public function __construct($surveyId, $collegeSGQA) {
+  public function __construct($surveyId, $collegeSGQA, $excludedGroups) {
     $this->surveyId       = $surveyId;
     $this->collegeSGQA    = $collegeSGQA;
+    $this->excludedGroups = $excludedGroups;
   }
 
 
@@ -17,7 +18,7 @@ class LSUtils {
     $s          = $sub ? '!' : '';
     $tmp        = explode('X', $this->collegeSGQA);
     $qid        = $tmp[count($tmp) - 1];
-    $query      = "SELECT qid, gid, parent_qid, type, title, question FROM {{questions}} WHERE parent_qid{$s}=0 AND sid='{$this->surveyId}' AND qid!='{$qid}' ORDER BY gid, question_order ASC";
+    $query      = "SELECT qid, gid, parent_qid, type, title, question FROM {{questions}} WHERE parent_qid{$s}=0 AND sid='{$this->surveyId}' AND gid NOT IN ({$this->excludedGroups}) AND qid!='{$qid}' ORDER BY gid, question_order ASC";
     $results    =  Yii::app()->db->createCommand($query)->query();
     $questions  = [];
 

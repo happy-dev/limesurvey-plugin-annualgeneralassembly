@@ -44,6 +44,11 @@ class AnnualGeneralMeeting extends PluginBase {
           'label' => gT('SGQA de la question cachée contenant les collèges'),
           'current' => $this->get('collegeSGQA', 'Survey', $event->get('survey'), ""),
         ),
+        'excludedGroups' => array(
+          'type'  =>'string',
+          'label' => gT('Identifiants des groupes de questions à exclure des résultats'),
+          'current' => $this->get('current', 'Survey', $event->get('survey'), ""),
+        ),
       )
      ));
   }
@@ -136,6 +141,7 @@ class AnnualGeneralMeeting extends PluginBase {
     $settings = [
       'weights'     => $this->get('weights', 'Survey', $surveyId),
       'collegeSGQA' => $this->get('collegeSGQA', 'Survey', $surveyId),
+      'excludedGroups' => $this->get('excludedGroups', 'Survey', $surveyId),
     ];
     $Results  = new Results($surveyId, $settings);
 

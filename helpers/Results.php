@@ -13,6 +13,7 @@ class Results {
     $this->surveyId       = $surveyId;
     $this->collegeSGQA    = $settings['collegeSGQA'];
     $this->weights        = json_decode($settings['weights'], true);
+    $this->excludedGroups = $settings['excludedGroups'];
   }
 
 
@@ -27,7 +28,7 @@ class Results {
     Yii::import('AnnualGeneralMeeting.helpers.Utils');
     Yii::import('AnnualGeneralMeeting.helpers.LSUtils');
 
-    $LSUtils              = new LSUtils($this->surveyId, $this->collegeSGQA);
+    $LSUtils              = new LSUtils($this->surveyId, $this->collegeSGQA, $this->excludedGroups);
     $survey               = SurveyDynamic::model($this->surveyId);
     $questions            = $LSUtils->getQuestions(); 
     $subQuestions         = $LSUtils->getQuestions(true); 
