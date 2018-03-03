@@ -47,7 +47,7 @@ class AnnualGeneralMeeting extends PluginBase {
         'excludedGroups' => array(
           'type'  =>'string',
           'label' => gT('Identifiants des groupes de questions à exclure des résultats'),
-          'current' => $this->get('current', 'Survey', $event->get('survey'), ""),
+          'current' => $this->get('excludedGroups', 'Survey', $event->get('survey'), ""),
         ),
       )
      ));
