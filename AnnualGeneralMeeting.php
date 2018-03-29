@@ -172,6 +172,7 @@ class AnnualGeneralMeeting extends PluginBase {
       'weights'       =>  $this->get('weights', 'Survey', $surveyId),
       'href'          =>  $href,
       'collegeSGQA'   =>  $this->get('collegeSGQA', 'Survey', $surveyId),
+      'excludedGroups' => $this->get('excludedGroups', 'Survey', $surveyId),
     ]);
 
     return $this->renderPartial('insertVotes', $InsertVotes->getFormData(), true);

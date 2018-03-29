@@ -19,7 +19,7 @@ class InsertVotes {
   public function __construct($surveyId, $settings) {
     Yii::import('AnnualGeneralMeeting.helpers.LSUtils');
 
-    $LSUtils              = new LSUtils($surveyId, $settings['collegeSGQA']);
+    $LSUtils              = new LSUtils($surveyId, $settings['collegeSGQA'], $settings['excludedGroups']);
 
     $this->surveyId       = $surveyId;
     $this->weights        = json_decode($settings['weights'], true);
