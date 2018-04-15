@@ -64,7 +64,7 @@ class Results {
 
   public function getSGQAStart() {
     $SGQAs      = [];
-    $query      = "SELECT gid FROM {{groups}} WHERE sid='{$this->surveyId}' AND group_name LIKE 'Résolutions%'";
+    $query      = "SELECT gid FROM {{groups}} WHERE sid='{$this->surveyId}'"; // AND group_name LIKE 'Résolutions%'";
     $groups     = Yii::app()->db->createCommand($query)->query();
 
     foreach($groups as $group) {
