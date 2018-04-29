@@ -60,6 +60,11 @@ $(document).ready(function() {
 
 
   iConfirm.on("click", function(e) {
+    FORM.submit();
+  });
+
+  // Backup
+  iConfirm_backup.on("click", function(e) {
     formSubmited = true;
     verifyTotals();
 
