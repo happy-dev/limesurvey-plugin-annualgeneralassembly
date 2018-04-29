@@ -149,7 +149,8 @@ foreach($questions as $question) {
 
     foreach($choices[$question['qid']] as $code => $answer) {
       if (!Utils::nullOrEmpty($code)) {// We filter out empty votes
-        $html .=  "<td>{$resultsByQuestion[$question['qid']][$code]['total']}</td>";
+        $resTotal = Utils::nullOrEmpty($resultsByQuestion[$question['qid']][$code]['total']) ? '0' : $resultsByQuestion[$question['qid']][$code]['total'];
+        $html .=  "<td>{$resTotal}</td>";
         $html .=  "<td><strong><span class=\"data-{$question['sgqa']}\">". round($resultsByQuestion[$question['qid']][$code]['result'], 2) ."</span>%</strong></td>";
       }
     }
