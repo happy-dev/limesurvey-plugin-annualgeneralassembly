@@ -48,7 +48,7 @@
 
     // Generate an array of hex colors of the correct size
     function getHexColors(length) {
-      var colors = ["#FF6384", "#36A2EB", "#FFCE56", "#cc00cc", "#00cccc", "#66cc99", "#c65353", "#ffff66", "#bf8040", "#6666ff"];
+      var colors = ["#36A2EB", "#FF6384", "#FFCE56", "#cc00cc", "#00cccc", "#66cc99", "#c65353", "#ffff66", "#bf8040", "#6666ff"];
 
       for(var i=0; i<10; i++) {
         colors = colors.concat(colors);
