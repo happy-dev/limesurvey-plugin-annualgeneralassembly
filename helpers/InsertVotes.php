@@ -61,6 +61,7 @@ class InsertVotes {
 
   // Check batch name unicity
   public function checkNameUnicity($name, $echo = false) {
+    $name   = mysql_real_escape_string($name);
     $query  = "SELECT startlanguage FROM {{survey_$this->surveyId}} WHERE startlanguage='{$name}'";
     $result =  Yii::app()->db->createCommand($query)->query();
 
@@ -106,8 +107,8 @@ class InsertVotes {
       $buffer     = [];
       $buffer[]   = "'". $now ."'";// submitdate
       $buffer[]   = $this->lastPage;// lastpage
-      $buffer[]   = "'". $_POST['batch-name'] ."'";// startlanguage
-      $buffer[]   = "'". $_POST['college'] ."'";
+      $buffer[]   = "'". mysql_real_escape_string($_POST['batch-name']) ."'";// startlanguage
+      $buffer[]   = "'". mysql_real_escape_string($_POST['college']) ."'";
 
       foreach($votes as $sgqa => $codes) {
         $codesLength = count($codes);
