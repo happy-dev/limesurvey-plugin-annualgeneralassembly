@@ -1,5 +1,7 @@
 <?php
-use \ls\menu\MenuItem;
+error_reporting(E_ALL | E_STRICT);
+//*** Changed by Nathanaël Drouard ***/
+use \LimeSurvey\Menu\MenuItem;
 
 /**
  * Entry point of the plugin
@@ -11,14 +13,14 @@ class AnnualGeneralMeeting extends PluginBase {
   protected $storage            = 'DbStorage';
   protected $defaultSettings    = '{"Consommateurs": 0.2, "Salariés": 0.2, "Producteurs": 0.6}';
   
-
-  public function __construct(PluginManager $manager, $id) {
-    parent::__construct($manager, $id);
-
-    $this->subscribe('beforeSurveySettings');
-    $this->subscribe('newSurveySettings');
-    $this->subscribe('beforeToolsMenuRender');
-  }
+  //*** Changed by Nathanaël Drouard ***/
+  //    __construct replaced by init
+  public function init()
+    {
+      $this->subscribe('beforeSurveySettings');
+      $this->subscribe('newSurveySettings');
+      $this->subscribe('beforeToolsMenuRender');
+    }
 
 
   /**
@@ -134,7 +136,11 @@ class AnnualGeneralMeeting extends PluginBase {
     Yii::import('AnnualGeneralMeeting.helpers.Results');
 
     $assetsPath = Yii::app()->assetManager->publish(dirname(__FILE__));
-    App()->getClientScript()->registerScriptFile($assetsPath . '/node_modules/chart.js/dist/Chart.min.js');
+    $nodeModuleAssetsPath = Yii::app()->assetManager->publish(dirname(__FILE__).'/node_modules');
+    //*** Changed by Nathanaël Drouard ***/
+    //$assetsPath did not work for node_modules. Remplaced by $nodeModuleAssetsPath
+    App()->getClientScript()->registerScriptFile($nodeModuleAssetsPath 
+      . '/chart.js/dist/Chart.min.js');
     App()->getClientScript()->registerScriptFile($assetsPath . '/js/result.js');
     App()->getClientScript()->registerCssFile($assetsPath . '/css/results.css');
 

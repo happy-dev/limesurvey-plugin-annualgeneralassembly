@@ -61,7 +61,10 @@ class InsertVotes {
 
   // Check batch name unicity
   public function checkNameUnicity($name, $echo = false) {
-    $name   = mysql_real_escape_string($name);
+    //*** Changed by Nathanaël Drouard  : 
+    //    Fix mysql_real_escape_string bug in PHP7 : only if fuction exists
+    if(function_exists('mysql_real_escape_string'))
+      $name   = mysql_real_escape_string($name);
     $query  = "SELECT startlanguage FROM {{survey_$this->surveyId}} WHERE startlanguage='{$name}'";
     $result =  Yii::app()->db->createCommand($query)->query();
 
@@ -103,12 +106,22 @@ class InsertVotes {
 
     // Prepare values for the SQL query
     while ($this->_someVotesLeft($votes)) {
+      //*** Changed by Nathanaël Drouard  : 
+      //    Fix mysql_real_escape_string bug in PHP7 : only if fuction exists
+      if(function_exists('mysql_real_escape_string')) {
+        $name = mysql_real_escape_string($_POST['batch-name']);
+        $college = mysqli_real_escape_string($_POST['college']);
+      } else {
+        $name = $_POST['batch-name'];
+        $college = $_POST['college'];
+      }
+
       $filledSGQA = '';
       $buffer     = [];
       $buffer[]   = "'". $now ."'";// submitdate
       $buffer[]   = $this->lastPage;// lastpage
-      $buffer[]   = "'". mysql_real_escape_string($_POST['batch-name']) ."'";// startlanguage
-      $buffer[]   = "'". mysql_real_escape_string($_POST['college']) ."'";
+      $buffer[]   = "'". $name ."'";// startlanguage
+      $buffer[]   = "'". $college ."'";
 
       foreach($votes as $sgqa => $codes) {
         $codesLength = count($codes);
