@@ -11,6 +11,8 @@ if (count($batches) > 0) {
   $html .=  '<table class="table table-bordered table-hover table-condensed">';
   $html .=   '<tr class="active">';
   $html .=     '<td><strong>Nom</strong></td>';
+  //*** Added by Nathanaël Drouard ***/
+  $html .=     '<td><strong>Collège</strong></td>';
   $html .=     '<td><strong>Nombre de votes</strong></td>';
   $html .=     '<td><strong>Date</strong></td>';
   $html .=     '<td><strong>Supprimer</strong></td>';
@@ -19,6 +21,8 @@ if (count($batches) > 0) {
   foreach($batches as $batch) {
     $html .= '<tr>';
     $html .=  '<td>'. $batch['startlanguage'] .'</td>';
+    //*** Added by Nathanaël Drouard ***/
+    $html .=  '<td>'. $batch['college'] .'</td>';
     $html .=  '<td>'. $batch['count'] .'</td>';
     $html .=  '<td>'. $batch['submitdate'] .'</td>';
     $html .=  '<td><a href="#" data-toggle="modal" data-target="#confirm-deletion-modal" data-name="'. $batch['startlanguage'] .'" class="delete-btn text-danger h2">&times;</a></td>';

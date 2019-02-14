@@ -20,8 +20,10 @@ class MonitorBatches {
 
 
   // Get the useful information to output the form
-  public function getFormData() {
-    $query      = "SELECT startlanguage, COUNT(*) AS count, submitdate FROM {{survey_$this->surveyId}} WHERE startlanguage!='fr' GROUP BY startlanguage";
+  //*** Changed by Nathanaël Drouard ***/
+  // add $collegeSGQA to show college column
+  public function getFormData($collegeSGQA) {
+    $query      = "SELECT startlanguage, $collegeSGQA AS college, COUNT(*) AS count, submitdate FROM {{survey_$this->surveyId}} WHERE startlanguage!='fr' GROUP BY startlanguage";
 
     return  array(
       'batches' => Yii::app()->db->createCommand($query)->query(),

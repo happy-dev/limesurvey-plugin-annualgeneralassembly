@@ -204,7 +204,10 @@ class AnnualGeneralMeeting extends PluginBase {
     );
 
     $MonitorBatches  = new MonitorBatches($surveyId, $href);
+    //*** Added by Nathanaël Drouard ***/
+    //to show college column
+    $collegeSGQA = $this->get('collegeSGQA', 'Survey', $surveyId);
 
-    return $this->renderPartial('monitorBatches', $MonitorBatches->getFormData(), true);
+    return $this->renderPartial('monitorBatches', $MonitorBatches->getFormData($collegeSGQA), true);
   }
 }
