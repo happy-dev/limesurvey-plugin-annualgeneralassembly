@@ -38,7 +38,7 @@ class AnnualGeneralMeeting extends PluginBase {
           'label' => gT('Pondérations par collège'),
           'editorOptions' =>array('mode'=>'tree'),
           'help'  => gT("Renseignez les pondérations des différents collèges pour le calcul des votes en AG. Exemple : 0.2"),
-          'current' => $this->get('weights', 'Survey', $event->get('survey'), json_decode($this->defaultSettings)),
+          'current' => json_decode($this->get('weights', 'Survey', $event->get('survey'), $this->defaultSettings)),
         ),
         'collegeSGQA' => array(
           'type'  =>'string',
