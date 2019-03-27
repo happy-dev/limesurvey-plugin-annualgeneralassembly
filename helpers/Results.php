@@ -84,7 +84,8 @@ class Results {
       foreach($answer as $sgqa => $code) {
         if (!Utils::nullOrEmpty($code) && !Utils::nullOrEmpty($answer[$this->collegeSGQA])) {
           if (Utils::startsByOneOfThese($sgqa, $sgqaStart)) {
-            if (false == strpos($sgqa, 'SQ')) {// Radiobox questions (resolutions)
+            if (false === strpos($sgqa, 'SQ')
+            && false === strpos($sgqa, 'A')) {// Radiobox questions (resolutions)
               if (!isset($resultsByCollege[$sgqa])) {
                 $resultsByCollege[$sgqa] = [];
               }
@@ -104,7 +105,10 @@ class Results {
               }
             }
             else {// Checkboxes questions (administrators election)
-              $array      = explode('SQ', $sgqa);
+              if (false !== strpos($sgqa, 'SQ'))
+                $array      = explode('SQ', $sgqa);
+              else
+                $array      = explode('A', $sgqa);
               $parentSGQA = $array[0];
 
               if (!isset($resultsByCollege[$parentSGQA])) {
