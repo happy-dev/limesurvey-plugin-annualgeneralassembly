@@ -7,6 +7,8 @@ class Results {
   protected $surveyId     = 0;
   protected $collegeSGQA  = '';
   protected $weights      = null;
+
+  protected $countsByCollege = [];
   
 
   public function __construct($surveyId, $settings) {
@@ -37,8 +39,8 @@ class Results {
     $answers              = $this->getAnswers();
     $resultsByCollege     = $this->getResultsByCollege($answers);
     $resultsByQuestion    = $this->getResultsByQuestion($questions, $choices, $resultsByCollege);
-    $countsByCollege      = $this->getRespondentsCount($resultsByCollege);
-    $resultsBySubQuestion = $this->getResultsBySubQuestion($subQuestions, $resultsByCollege, $countsByCollege);
+    //$countsByCollege      = $this->getRespondentsCount($resultsByCollege);
+    $resultsBySubQuestion = $this->getResultsBySubQuestion($subQuestions, $resultsByCollege, $this->countsByCollege);
 
     return array(
       'surveyId'                  => $this->surveyId,
@@ -46,7 +48,7 @@ class Results {
       'questions'                 => $questions,
       'subQuestions'              => $subQuestions,
       'choices'                   => $choices,
-      'countsByCollege'           => $countsByCollege,
+      'countsByCollege'           => $this->countsByCollege,
       'resultsByCollege'          => $resultsByCollege,
       'resultsByQuestion'         => $resultsByQuestion,
       'resultsBySubQuestion'      => $resultsBySubQuestion,
@@ -81,57 +83,89 @@ class Results {
     $resultsByCollege = [];
 
     foreach($answers as $answer) {
+      $theCollege = $answer[$this->collegeSGQA];
+      $id = $answer['id'];
+
+
+      if(!isset($this->countsByCollege[$theCollege])) {
+        $this->countsByCollege[$theCollege] = 0;
+      }
+      $hasVoted = false;
+
+      $this->countsByCollege[$theCollege];
       foreach($answer as $sgqa => $code) {
-        if (!Utils::nullOrEmpty($code) && !Utils::nullOrEmpty($answer[$this->collegeSGQA])) {
+        if (!Utils::nullOrEmpty($code) && !Utils::nullOrEmpty($theCollege)) {
+          
+          if(false !== strpos($sgqa, 'X')) {
+            list($s, $g, $q) = explode('X', $sgqa);
+
+            if(!$hasVoted 
+            && false === strpos($this->excludedGroups, $g)
+            && $code != $theCollege
+            ) {
+              $this->countsByCollege[$theCollege]++;
+              $hasVoted = true;
+            }
+          }
+          
+          
           if (Utils::startsByOneOfThese($sgqa, $sgqaStart)) {
-            if (false == strpos($sgqa, 'SQ')) {// Radiobox questions (resolutions)
+            if (false === strpos($sgqa, 'SQ')
+            && false === strpos($sgqa, 'A')) {// Radiobox questions (resolutions)
               if (!isset($resultsByCollege[$sgqa])) {
                 $resultsByCollege[$sgqa] = [];
               }
-              if (!isset($resultsByCollege[$sgqa][$answer[$this->collegeSGQA]])) {
-                $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]]              = [];
-                $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]]['total']     = 0;
-                $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]]['adminVote'] = false;
-                $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]]['college']   = $answer[$this->collegeSGQA];
+              if (!isset($resultsByCollege[$sgqa][$theCollege])) {
+                $resultsByCollege[$sgqa][$theCollege]              = [];
+                $resultsByCollege[$sgqa][$theCollege]['total']     = 0;
+                $resultsByCollege[$sgqa][$theCollege]['adminVote'] = false;
+                $resultsByCollege[$sgqa][$theCollege]['college']   = $theCollege;
               }
-              if (!isset($resultsByCollege[$sgqa][$answer[$this->collegeSGQA]][$code])) {
-                $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]][$code] = 0;
+              if (!isset($resultsByCollege[$sgqa][$theCollege][$code])) {
+                $resultsByCollege[$sgqa][$theCollege][$code] = 0;
               }
-              $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]][$code]++;
+              $resultsByCollege[$sgqa][$theCollege][$code]++;
 
               if (!Utils::nullOrEmpty($code)) {// We filter out empty answers
-                $resultsByCollege[$sgqa][$answer[$this->collegeSGQA]]['total']++;
+                $resultsByCollege[$sgqa][$theCollege]['total']++;
               }
             }
             else {// Checkboxes questions (administrators election)
-              $array      = explode('SQ', $sgqa);
+              if (false !== strpos($sgqa, 'SQ'))
+                $array      = explode('SQ', $sgqa);
+              else
+                $array      = explode('A', $sgqa);
               $parentSGQA = $array[0];
 
               if (!isset($resultsByCollege[$parentSGQA])) {
                 $resultsByCollege[$parentSGQA] = [];
               }
-              if (!isset($resultsByCollege[$parentSGQA][$answer[$this->collegeSGQA]])) {
-                $resultsByCollege[$parentSGQA][$answer[$this->collegeSGQA]]           = [];
-                $resultsByCollege[$parentSGQA][$answer[$this->collegeSGQA]]['total']  = 0;
-                $resultsByCollege[$parentSGQA][$answer[$this->collegeSGQA]]['adminVote']= true;
+              if (!isset($resultsByCollege[$parentSGQA][$theCollege])) {
+                $resultsByCollege[$parentSGQA][$theCollege]           = [];
+                $resultsByCollege[$parentSGQA][$theCollege]['total']  = 0;
+                $resultsByCollege[$parentSGQA][$theCollege]['adminVote']= true;
               }
-              if (!isset($resultsByCollege[$parentSGQA][$answer[$this->collegeSGQA]][$sgqa])) {
-                $resultsByCollege[$parentSGQA][$answer[$this->collegeSGQA]][$sgqa] = [];
+              if (!isset($resultsByCollege[$parentSGQA][$theCollege][$sgqa])) {
+                $resultsByCollege[$parentSGQA][$theCollege][$sgqa] = [];
               }
-              if (!isset($resultsByCollege[$parentSGQA][$answer[$this->collegeSGQA]][$sgqa][$code])) {
-                $resultsByCollege[$parentSGQA][$answer[$this->collegeSGQA]][$sgqa][$code] = 0;
+              if (!isset($resultsByCollege[$parentSGQA][$theCollege][$sgqa][$code])) {
+                $resultsByCollege[$parentSGQA][$theCollege][$sgqa][$code] = 0;
               }
-              $resultsByCollege[$parentSGQA][$answer[$this->collegeSGQA]][$sgqa][$code]++;
+              $resultsByCollege[$parentSGQA][$theCollege][$sgqa][$code]++;
+
+
+              
 
               if (!Utils::nullOrEmpty($code)) {// We filter out empty answers
-                $resultsByCollege[$parentSGQA][$answer[$this->collegeSGQA]]['total']++;
+                $resultsByCollege[$parentSGQA][$theCollege]['total']++;
               }
             }
+            
           }
         }
       }
     }
-
+    //print_r($resultsByCollege);
     return $resultsByCollege;
   }
 
@@ -141,28 +175,30 @@ class Results {
     $resultsByQuestion = [];
 
     foreach($questions as $question) {
-      $resultsByQuestion[ $question['qid'] ]['total'] = 0;
+      $qid = $question['qid'];
+
+      $resultsByQuestion[$qid]['total'] = 0;
       $colleges = $resultsByCollege[$this->surveyId .'X'. $question['gid'] .'X'. $question['qid']];
 
       foreach($colleges as $college => $codesToResults) {
-        $codes = isset($choices[$question['qid']]) ? $choices[$question['qid']] : null;
+        $codes = isset($choices[$qid]) ? $choices[$qid] : null;
 
         if (isset($codes)) {
           foreach($codes as $code => $answer) {
             if (isset($codesToResults[$code]) && $code != 'total') {
               $percentage = Utils::percentage($codesToResults[$code], $codesToResults['total']);
 
-              if (!isset($resultsByQuestion[ $question['qid'] ][$code])) {
-                $resultsByQuestion[ $question['qid'] ][$code] = [
+              if (!isset($resultsByQuestion[$qid][$code])) {
+                $resultsByQuestion[ $qid ][$code] = [
                   'total'   => 0,
                   'result'  => 0,
                 ];
               }
-              $resultsByQuestion[ $question['qid'] ][$code]['total'] += $codesToResults[$code];
-              $resultsByQuestion[ $question['qid'] ]['total']        += $codesToResults[$code];
+              $resultsByQuestion[$qid][$code]['total'] += $codesToResults[$code];
+              $resultsByQuestion[$qid]['total']        += $codesToResults[$code];
 
               if (isset($this->weights[$college])) {
-                $resultsByQuestion[ $question['qid'] ][$code]['result']  += $percentage * $this->weights[$college];
+                $resultsByQuestion[ $qid ][$code]['result']  += $percentage * $this->weights[$college];
               }
               else {
                 die( gT("La pondération pour le collège '{$college}' n'est pas définie.") );
