@@ -69,7 +69,7 @@ foreach($questions as $question) {
           if ($subQuestion['sgqa'] == $sgqa) {// If some votes for this answer
             $result = isset($chs['Y']) ? $chs['Y'] : 0;
             $html .=  "<td>{$result}</td>";
-            $percent  = count($countsByCollege[$college]);
+            $percent  = $countsByCollege[$college];
             $html .=  "<td>". round(Utils::percentage($result, $percent), 2) ."% (total votant : $percent )</td>";
 
             next($sgqas);
@@ -129,8 +129,7 @@ foreach($questions as $question) {
           if (!Utils::nullOrEmpty($code)) {// We filter out empty votes
             $result  = isset($codesToResults[$code]) ? $codesToResults[$code] : 0;
             $html   .=   "<td>{$result}</td>";
-            //$html   .=   "<td>". round(Utils::percentage($result, $codesToResults['total']), 2) ."%</td>";
-            $percent  = count($countsByCollege[$college]);
+            $percent  = $countsByCollege[$college];
             $html .=  "<td>". round(Utils::percentage($result, $percent), 2) ."% (total votant : $percent )</td>";
           }
         }

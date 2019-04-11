@@ -88,8 +88,30 @@ class Results {
       $theCollege = $answer[$this->collegeSGQA];
       $token = $answer['token'];
       $id = $answer['id'];
+
+
+      if(!isset($this->countsByCollege[$theCollege])) {
+        $this->countsByCollege[$theCollege] = 0;
+      }
+      $hasVoted = false;
+
+      $this->countsByCollege[$theCollege];
       foreach($answer as $sgqa => $code) {
         if (!Utils::nullOrEmpty($code) && !Utils::nullOrEmpty($theCollege)) {
+          
+          if(false !== strpos($sgqa, 'X')) {
+            list($s, $g, $q) = explode('X', $sgqa);
+
+            if(!$hasVoted 
+            && false === strpos($this->excludedGroups, $g)
+            && $code != $theCollege
+            ) {
+              $this->countsByCollege[$theCollege]++;
+              $hasVoted = true;
+            }
+          }
+          
+          
           if (Utils::startsByOneOfThese($sgqa, $sgqaStart)) {
             if (false === strpos($sgqa, 'SQ')
             && false === strpos($sgqa, 'A')) {// Radiobox questions (resolutions)
@@ -135,18 +157,13 @@ class Results {
               $resultsByCollege[$parentSGQA][$theCollege][$sgqa][$code]++;
 
 
-              if(!isset($this->countsByCollege[$theCollege])) {
-                $this->countsByCollege[$theCollege] = [];
-              }
               
-              if(!in_array($id, $this->countsByCollege[$theCollege])) {
-                array_push($this->countsByCollege[$theCollege], $id);
-              }
 
               if (!Utils::nullOrEmpty($code)) {// We filter out empty answers
                 $resultsByCollege[$parentSGQA][$theCollege]['total']++;
               }
             }
+            
           }
         }
       }
@@ -161,28 +178,30 @@ class Results {
     $resultsByQuestion = [];
 
     foreach($questions as $question) {
-      $resultsByQuestion[ $question['qid'] ]['total'] = 0;
+      $qid = $question['qid'];
+
+      $resultsByQuestion[$qid]['total'] = 0;
       $colleges = $resultsByCollege[$this->surveyId .'X'. $question['gid'] .'X'. $question['qid']];
 
       foreach($colleges as $college => $codesToResults) {
-        $codes = isset($choices[$question['qid']]) ? $choices[$question['qid']] : null;
+        $codes = isset($choices[$qid]) ? $choices[$qid] : null;
 
         if (isset($codes)) {
           foreach($codes as $code => $answer) {
             if (isset($codesToResults[$code]) && $code != 'total') {
               $percentage = Utils::percentage($codesToResults[$code], $codesToResults['total']);
 
-              if (!isset($resultsByQuestion[ $question['qid'] ][$code])) {
-                $resultsByQuestion[ $question['qid'] ][$code] = [
+              if (!isset($resultsByQuestion[$qid][$code])) {
+                $resultsByQuestion[ $qid ][$code] = [
                   'total'   => 0,
                   'result'  => 0,
                 ];
               }
-              $resultsByQuestion[ $question['qid'] ][$code]['total'] += $codesToResults[$code];
-              $resultsByQuestion[ $question['qid'] ]['total']        += $codesToResults[$code];
+              $resultsByQuestion[$qid][$code]['total'] += $codesToResults[$code];
+              $resultsByQuestion[$qid]['total']        += $codesToResults[$code];
 
               if (isset($this->weights[$college])) {
-                $resultsByQuestion[ $question['qid'] ][$code]['result']  += $percentage * $this->weights[$college];
+                $resultsByQuestion[ $qid ][$code]['result']  += $percentage * $this->weights[$college];
               }
               else {
                 die( gT("La pondération pour le collège '{$college}' n'est pas définie.") );
@@ -221,7 +240,7 @@ class Results {
           $choices = $colleges[$college][$sgqa];
 
           $result     = isset($choices['Y']) ? $choices['Y'] : 0;
-          $percentage = Utils::percentage($result, count($countsByCollege[$college]));
+          $percentage = Utils::percentage($result, $countsByCollege[$college]);
 
           $resultsBySubQuestion[$subQuestion['parent_qid']]['total']        += $result;
           $resultsBySubQuestion[$subQuestion['parent_qid']][$subQuestion['qid']]['total'] += $result;
