@@ -84,7 +84,7 @@ class Results {
 
     foreach($answers as $answer) {
       $theCollege = $answer[$this->collegeSGQA];
-      $college = urldecode($college);
+      $theCollege = urldecode($theCollege);
       $id = $answer['id'];
 
 
