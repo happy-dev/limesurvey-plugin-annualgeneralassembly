@@ -84,6 +84,7 @@ class Results {
 
     foreach($answers as $answer) {
       $theCollege = $answer[$this->collegeSGQA];
+      $college = urldecode($college);
       $id = $answer['id'];
 
 
@@ -181,6 +182,7 @@ class Results {
       $colleges = $resultsByCollege[$this->surveyId .'X'. $question['gid'] .'X'. $question['qid']];
 
       foreach($colleges as $college => $codesToResults) {
+        $college = urldecode($college);
         $codes = isset($choices[$qid]) ? $choices[$qid] : null;
 
         if (isset($codes)) {
@@ -233,6 +235,7 @@ class Results {
       $colleges   = $resultsByCollege[$parentSGQA];
 
       foreach($colleges as $college => $sgqas) {
+        $college = urldecode($college);
         if (isset($colleges[$college][$sgqa]) && isset($this->weights[$college])) {
           $choices = $colleges[$college][$sgqa];
 
