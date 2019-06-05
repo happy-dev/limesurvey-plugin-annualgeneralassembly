@@ -34,14 +34,11 @@ class MonitorBatches {
 
   // Delete the given batch
   public function deleteBatch() {
-    //*** Changed by Nathanaël Drouard  : 
-    //  Fix mysql_real_escape_string bug in PHP7 : only if fuction exists 
-    if(function_exists('mysql_real_escape_string'))
-      $name = mysql_real_escape_string($_POST['batch-name']);
-    else 
-      $name = $_POST['batch-name'];
+    //*** Changed by Nathanaël Drouard  :  
+    //    Fix mysql_real_escape_string bug : do not work with LS3
 
-    $query      = "DELETE FROM {{survey_$this->surveyId}} WHERE startlanguage='{$name}'";
-    Yii::app()->db->createCommand($query)->query();
+
+    $query      = "DELETE FROM {{survey_$this->surveyId}} WHERE startlanguage=':name'";
+    Yii::app()->db->createCommand($query)->query()->bindParam(":name", $name, PDO::PARAM_INT)->query() or safeDie("Couldn't select name<br />$query<br />");
   }
 }

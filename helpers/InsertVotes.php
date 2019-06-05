@@ -62,11 +62,11 @@ class InsertVotes {
   // Check batch name unicity
   public function checkNameUnicity($name, $echo = false) {
     //*** Changed by Nathanaël Drouard  : 
-    //    Fix mysql_real_escape_string bug in PHP7 : only if fuction exists
-    if(function_exists('mysql_real_escape_string'))
-      $name   = mysql_real_escape_string($name);
-    $query  = "SELECT startlanguage FROM {{survey_$this->surveyId}} WHERE startlanguage='{$name}'";
-    $result =  Yii::app()->db->createCommand($query)->query();
+    //    Fix mysql_real_escape_string bug : do not work with LS3
+
+    $query  = "SELECT startlanguage FROM {{survey_$this->surveyId}} WHERE startlanguage=:name";
+    $result = Yii::app()->db->createCommand($query)->bindParam(":name", $name, PDO::PARAM_INT)->query() or safeDie("Couldn't select name<br />$query<br />");
+    //$result =  Yii::app()->db->createCommand($query)->query();
 
     if ($echo) {
       echo $result->count();
@@ -107,21 +107,16 @@ class InsertVotes {
     // Prepare values for the SQL query
     while ($this->_someVotesLeft($votes)) {
       //*** Changed by Nathanaël Drouard  : 
-      //    Fix mysql_real_escape_string bug in PHP7 : only if fuction exists
-      if(function_exists('mysql_real_escape_string')) {
-        $name = mysql_real_escape_string($_POST['batch-name']);
-        $college = mysqli_real_escape_string($_POST['college']);
-      } else {
-        $name = $_POST['batch-name'];
-        $college = $_POST['college'];
-      }
+    //    Fix mysql_real_escape_string bug : do not work with LS3
+      $name = Yii::app()->db->quoteValue($_POST['batch-name']);
+      $college = Yii::app()->db->quoteValue($_POST['college']);
 
       $filledSGQA = '';
       $buffer     = [];
       $buffer[]   = "'". $now ."'";// submitdate
       $buffer[]   = $this->lastPage;// lastpage
-      $buffer[]   = "'". $name ."'";// startlanguage
-      $buffer[]   = "'". $college ."'";
+      $buffer[]   = $name;// startlanguage
+      $buffer[]   = $college;
 
       foreach($votes as $sgqa => $codes) {
         $codesLength = count($codes);
@@ -160,7 +155,6 @@ class InsertVotes {
 
     $query      = "INSERT INTO {{survey_$this->surveyId}} (submitdate, lastpage, startlanguage, {$this->collegeSGQA}, ". implode(', ', array_keys($votes)) .") VALUES ". implode(', ', $values);
     Yii::app()->db->createCommand($query)->query();
-
     $this->votesInserted = true;
   }
 
