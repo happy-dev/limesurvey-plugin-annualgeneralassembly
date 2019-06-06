@@ -37,8 +37,8 @@ class MonitorBatches {
     //*** Changed by Nathanaël Drouard  :  
     //    Fix mysql_real_escape_string bug : do not work with LS3
 
-
-    $query      = "DELETE FROM {{survey_$this->surveyId}} WHERE startlanguage=':name'";
-    Yii::app()->db->createCommand($query)->query()->bindParam(":name", $name, PDO::PARAM_INT)->query() or safeDie("Couldn't select name<br />$query<br />");
+    $name = Yii::app()->db->quoteValue($_POST['batch-name']);
+    $query      = "DELETE FROM {{survey_$this->surveyId}} WHERE startlanguage=$name";
+    Yii::app()->db->createCommand($query)->query();
   }
 }
